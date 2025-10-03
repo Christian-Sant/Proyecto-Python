@@ -36,3 +36,4 @@ class interfazUsuario(QWidget) :
         self.registrarse.setFont(QFont("Arial", 12))
         self.registrarse.move(40,215)
 
+modngdoifnv
