@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QLineEdit, QWidget, QLabel, QPushButton # type: ignore
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont #type: ignore
 
 class interfazUsuario(QWidget) :
     def __init__(self):
@@ -12,9 +12,13 @@ class interfazUsuario(QWidget) :
         self.txtIniciarSesion.move(100, 80)
         self.txtIniciarSesion.setFont(QFont("Arial", 12)) 
         ###############################################
-        self.txtIniciarSesion = QLabel("Iniciar Sesion", self)
-        self.txtIniciarSesion.move(100, 80)
-        self.txtIniciarSesion.setFont(QFont("Arial", 12)) 
+        self.txtusuario = QLabel("Usuario: ", self)
+        self.txtusuario.move(40, 118)
+        self.txtusuario.setFont(QFont("Arial", 12)) 
+        ###############################################
+        self.txtPassword = QLabel("Contraseña: ", self)
+        self.txtPassword.move(40, 173)
+        self.txtPassword.setFont(QFont("Arial", 12)) 
         ############################################### 
         self.usuario = QLineEdit(self) 
         self.usuario.move(40,135)
@@ -35,4 +39,3 @@ class interfazUsuario(QWidget) :
         self.registrarse.resize(90,30)
         self.registrarse.setFont(QFont("Arial", 12))
         self.registrarse.move(40,215)
-
