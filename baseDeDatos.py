@@ -1,21 +1,20 @@
 import sqlite3
-from utilidades import idAzarUsuario
 def baseDeDatos():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     conexion.execute("PRAGMA foreign_keys = ON;") 
     cursor = conexion.cursor()
 
     cursor.execute("""
-        ID_Usuario VARCHAR(12),
-        Usuario VARCHAR(20),
+    CREATE TABLE IF NOT EXISTS Usuarios (
         Correo VARCHAR(100),
-        Contraseña VARCHAR(100),
-        CONSTRAINT PK_IDUSUARIO PRIMARY KEY (ID_Usuario)
+        Contraseña VARCHAR(100) NOT NULL,
+        CONSTRAINT PK_Correo PRIMARY KEY (Correo)
     )
     """)
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Incidencias (
-        ID_Usuario VARCHAR(12),
+        Correo VARCHAR(100),
         ID_Incidencia VARCHAR(12),
         Titulo VARCHAR(40),
         Descripcion VARCHAR(200),
@@ -25,27 +24,24 @@ def baseDeDatos():
         CONSTRAINT PK_IDINCIDENCIAS PRIMARY KEY (ID_Incidencia),
         CONSTRAINT CHK_GRAVEDAD CHECK (Gravedad IN ('Baja', 'Media', 'Alta', 'Grave', 'Muy Grave')),
         CONSTRAINT CHK_ESTADO CHECK (Estado IN ('ABIERTO', 'CERRADO')),
-        CONSTRAINT FK_INCIDENCIA FOREIGN KEY (ID_Usuario) REFERENCES Usuarios (ID_Usuario) ON UPDATE CASCADE
+        CONSTRAINT FK_INCIDENCIA FOREIGN KEY (Correo) REFERENCES Usuarios (Correo) ON UPDATE CASCADE
     )
     """)
     conexion.commit()
     conexion.close()
 
-def vistaIdUsuario():
+def vistaCorreo():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
-    consulta = ("Select ID_Usuario from Usuarios")
+    consulta = ("Select correo from Usuarios")
     cursor.execute(consulta)
     resultados = cursor.fetchall()
     conexion.close()
     return resultados
 
-def insertarUsuario(correo, usuario, password):
-    
+def insertarUsuario(correo, password):
     consulta = (
-        "INSERT INTO USUARIOS (id_usuario,usuario, correo, Contraseña) VALUES ('"
-        + idAzarUsuario() + "', '"
-        + usuario + "', '"
+        "INSERT INTO USUARIOS (correo, Contraseña) VALUES ('"
         + correo + "', '"
         + password + "')"
     )
