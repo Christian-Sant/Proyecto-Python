@@ -39,6 +39,15 @@ def vistaCorreo():
     conexion.close()
     return resultados
 
+def vistaCorreoYPassword():
+    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
+    cursor = conexion.cursor()
+    consulta = ("Select Correo,Contraseña from Usuarios")
+    cursor.execute(consulta)
+    resultados = cursor.fetchall()
+    conexion.close()
+    return resultados
+
 def insertarUsuario(correo, password):
     consulta = (
         "INSERT INTO USUARIOS (correo, Contraseña) VALUES ('"

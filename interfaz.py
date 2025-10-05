@@ -35,6 +35,7 @@ class interfazUsuario(QWidget) :
         self.iniciarSesion.resize(120,30)
         self.iniciarSesion.setFont(QFont("Arial", 12))
         self.iniciarSesion.move(140,215)
+        self.iniciarSesion.clicked.connect(self.verificarCorreoYPassword) # Los botones siempre al lado de su boton
         ###############################################
         self.registrarse = QPushButton("Registrar", self)
         self.registrarse.resize(90,30)
@@ -105,13 +106,31 @@ class interfazUsuario(QWidget) :
         self.registrarse2.clicked.connect(self.verificarCorreo)
         ##############################################
     def crearUsuario(self):
-        correo = self.correoRegistro.text()
-        password = self.passwordRegistro.text()
+        correo = self.correoRegistro.text().strip()
+        password = self.passwordRegistro.text().strip()
         insertarUsuario(correo, password)
+        self.txtRegistrarse.hide()
+        self.txtCorreo.hide()
+        self.correoRegistro.hide()
+        self.txtPasswordRegistro.hide()
+        self.passwordRegistro.hide()
+        self.registrarse2.hide()
+        self.txtConfirmarPasswordRegistro.hide()
+        self.confirmarPasswordRegistro.hide()
+        self.txtIniciarSesion.show()
+        self.CorreoIS.show()
+        self.password.show()
+        self.txtCorreoIS.show()
+        self.txtPassword.show()
+        self.iniciarSesion.show()
+        self.registrarse.show()
+        self.CorreoIS.clear()
+        self.password.clear()
+
         
     def validarYCrearUsuario(self):
-        passwordVerificar = self.passwordRegistro.text()
-        passwordConfirmar = self.confirmarPasswordRegistro.text()
+        passwordVerificar = self.passwordRegistro.text().strip()
+        passwordConfirmar = self.confirmarPasswordRegistro.text().strip()
         if passwordVerificar.strip() != "" and passwordVerificar == passwordConfirmar:
             self.crearUsuario()
         else:
@@ -126,7 +145,7 @@ class interfazUsuario(QWidget) :
         pkCorreos = []
         for i in correos:
             pkCorreos.append(i[0])
-        if self.correoRegistro.text() in pkCorreos:
+        if self.correoRegistro.text().strip() in pkCorreos:
             mensajeErrorCorreo = QMessageBox()
             mensajeErrorCorreo.setIcon(QMessageBox.Warning)
             mensajeErrorCorreo.setWindowTitle("Error")
@@ -134,3 +153,25 @@ class interfazUsuario(QWidget) :
             mensajeErrorCorreo.exec_()
         else:
             self.validarYCrearUsuario()
+    
+    def verificarCorreoYPassword(self):
+        from baseDeDatos import vistaCorreoYPassword
+        correosPassword = dict(vistaCorreoYPassword())
+        correo = self.CorreoIS.text().strip()
+        password = self.password.text().strip()
+        if correo in correosPassword:
+            if correosPassword[correo] == password:
+                #llamar un metodo(def) de Vicente, la interfaz
+                print("todo bien")
+            else:
+                mensajeErrorPassword = QMessageBox()
+                mensajeErrorPassword.setIcon(QMessageBox.Warning)
+                mensajeErrorPassword.setWindowTitle("Error")
+                mensajeErrorPassword.setText("Contraseña Incorrecta")
+                mensajeErrorPassword.exec_()
+        else:
+            mensajeErrorCorreo = QMessageBox()
+            mensajeErrorCorreo.setIcon(QMessageBox.Warning)
+            mensajeErrorCorreo.setWindowTitle("Error")
+            mensajeErrorCorreo.setText("Correo no registrado")
+            mensajeErrorCorreo.exec_()
