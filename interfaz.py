@@ -276,7 +276,7 @@ class interfazUsuario(QWidget) :
     #---------------------Metodo para Verificar si existe la cuenta y que pueda entrar en la App, esto es para el apartado Iniciar Sesion---------------------#
     def verificarCorreoYPassword(self):
         from baseDeDatos import vistaCorreoYPassword
-        correosPassword = dict(vistaCorreoYPassword())
+        correosPassword = dict(vistaCorreoYPassword())#Se hace un diccionario, en el cual el correo es la clave mientras que la contraseña es el valor del clave.
         correo = self.CorreoIS.text().strip()
         password = self.password.text().strip()
         if correo in correosPassword:
