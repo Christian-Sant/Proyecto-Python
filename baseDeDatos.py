@@ -1,9 +1,13 @@
 import sqlite3
+
+
+#---------------------Metodo de la base de datos---------------------# 
 def baseDeDatos():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     conexion.execute("PRAGMA foreign_keys = ON;") 
     cursor = conexion.cursor()
 
+    #---------------------Creacion de la base de datos---------------------# 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Usuarios (
         Correo VARCHAR(100),
@@ -11,7 +15,6 @@ def baseDeDatos():
         CONSTRAINT PK_Correo PRIMARY KEY (Correo)
     )
     """)
-
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Incidencias (
         Correo VARCHAR(100),
@@ -30,6 +33,10 @@ def baseDeDatos():
     conexion.commit()
     conexion.close()
 
+    #-----------------------------FIN------------------------------#
+
+
+#---------------------Metodo para ver el correo de la tabla usuarios---------------------# 
 def vistaCorreo():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
@@ -38,7 +45,10 @@ def vistaCorreo():
     resultados = cursor.fetchall()
     conexion.close()
     return resultados
+#-----------------------------FIN------------------------------#
 
+
+#---------------------Metodo para ver el correo y contraseña de la tabla usuarios---------------------# 
 def vistaCorreoYPassword():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
@@ -47,7 +57,10 @@ def vistaCorreoYPassword():
     resultados = cursor.fetchall()
     conexion.close()
     return resultados
+#-----------------------------FIN------------------------------#
 
+
+#---------------------Añadir nuevos usuarios a la base de datos---------------------# 
 def insertarUsuario(correo, password):
     consulta = (
         "INSERT INTO USUARIOS (correo, Contraseña) VALUES ('"
@@ -59,3 +72,4 @@ def insertarUsuario(correo, password):
     cursor.execute(consulta)
     conexion.commit()
     conexion.close()
+#-----------------------------FIN------------------------------#
