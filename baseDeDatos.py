@@ -73,3 +73,24 @@ def insertarUsuario(correo, password):
     conexion.commit()
     conexion.close()
 #-----------------------------FIN------------------------------#
+
+#---------------------Añadir nuevas incidencias a la base de datos---------------------# 
+def insertarIncidencia(iD_Incidencias, titulo, descripcion, gravedad, fecha):
+    correo = "1" #Necesitamos una manera de conseguir el correo del usuario que está añadiendo la incidencia
+    print("hola")
+    consulta = (
+    "INSERT INTO INCIDENCIAS (Correo, ID_Incidencias, Titulo, Descripcion, Gravedad, Fecha, Estado) VALUES ('"
+    + correo + "', '"
+    + iD_Incidencias + "', '"
+    + titulo + "', '"
+    + descripcion + "', '"
+    + gravedad + "', '"
+    + fecha + "', 'ABIERTO')"
+    )
+
+    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
+    cursor = conexion.cursor()
+    cursor.execute(consulta)
+    conexion.commit()
+    conexion.close()
+#-----------------------------FIN------------------------------#
