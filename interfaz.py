@@ -282,6 +282,7 @@ class interfazUsuario(QWidget) :
         if correo in correosPassword:
             if correosPassword[correo] == password:
                 #llamar un metodo(def) de Vicente, la interfaz
+                self.incidencias()
                 print("todo bien")
             else:
                 mensajeErrorPassword = QMessageBox()
@@ -297,3 +298,15 @@ class interfazUsuario(QWidget) :
             mensajeErrorCorreo.exec_()
 
     #-----------------------------FIN------------------------------#
+
+    def incidencias(self):
+        self.setWindowTitle("Incidencias")
+        self.setGeometry(200,200,1000,600)
+        self.txtIniciarSesion.hide()
+        self.CorreoIS.hide()
+        self.password.hide()
+        self.txtCorreoIS.hide()
+        self.txtPassword.hide()
+        self.iniciarSesion.hide()
+        self.registrarse.hide()
+ #-----------------------------FIN------------------------------#
