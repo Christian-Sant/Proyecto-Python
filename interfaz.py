@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton # type: ignore
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
-from baseDeDatos import insertarUsuario
+from PyQt5.QtCore import QDate #type: ignore
+from baseDeDatos import insertarUsuario, insertarIncidencia
 class interfazUsuario(QWidget) :
     def __init__(self):
         super().__init__()
@@ -301,7 +302,7 @@ class interfazUsuario(QWidget) :
 
     def incidencias(self):
         self.setWindowTitle("Incidencias")
-        self.setGeometry(200,200,1000,600)
+        self.setGeometry(200,200,500,500)
         self.txtIniciarSesion.hide()
         self.CorreoIS.hide()
         self.password.hide()
@@ -310,3 +311,76 @@ class interfazUsuario(QWidget) :
         self.iniciarSesion.hide()
         self.registrarse.hide()
  #-----------------------------FIN------------------------------#
+
+
+ #---------------------Label Titulo en el Apartado Incidencias---------------------#
+        self.txtTitulo = QLabel("Titulo: ", self)
+        self.txtTitulo.move(50, 140)
+        self.txtTitulo.setFont(QFont("Arial", 12)) 
+        self.txtTitulo.show()
+#-----------------------------FIN------------------------------#
+
+#---------------------Apartado para escribir el Titulo en el Apartado Incidencias---------------------#
+        self.escribirTitulo = QLineEdit(self) 
+        self.escribirTitulo.move(150,140)
+        self.escribirTitulo.resize(220, 20)
+        self.escribirTitulo.setFont(QFont("Arial", 12))
+        self.escribirTitulo.show()
+        #-----------------------------FIN------------------------------#
+
+#---------------------Label Descripcion en el Apartado Incidencias---------------------#
+        self.txtDescripcion = QLabel("Descripción: ", self)
+        self.txtDescripcion.move(50, 180)
+        self.txtDescripcion.setFont(QFont("Arial", 12)) 
+        self.txtDescripcion.show()
+        #-----------------------------FIN------------------------------#
+
+        #---------------------Apartado para escribir la Descripcion en el Apartado Incidencias---------------------#
+        self.escribirDescripcion = QTextEdit(self) 
+        self.escribirDescripcion.move(150,180)
+        self.escribirDescripcion.resize(220, 80)
+        self.escribirDescripcion.setFont(QFont("Arial", 12))
+        self.escribirDescripcion.show()
+        #-----------------------------FIN------------------------------#
+
+#---------------------Label Gravedad en el Apartado Incidencias---------------------#
+        self.txtGravedad = QLabel("Gravedad: ", self)
+        self.txtGravedad.move(50, 280)
+        self.txtGravedad.setFont(QFont("Arial", 12)) 
+        self.txtGravedad.show()
+        #-----------------------------FIN------------------------------#
+
+#---------------------Apartado para seleccionar la Gravedad en el Apartado Incidencias---------------------#
+        self.seleccionarGravedad = QComboBox(self) 
+        self.seleccionarGravedad.move(150,280)
+        self.seleccionarGravedad.resize(100, 30)
+        self.seleccionarGravedad.setFont(QFont("Arial", 12))
+        self.seleccionarGravedad.addItems(["Baja", "Media", "Alta", "Grave", "Muy Grave"])
+        self.seleccionarGravedad.show()
+        #-----------------------------FIN------------------------------#
+
+#---------------------Label Fecha en el Apartado Incidencias---------------------#
+        self.txtFecha = QLabel("Fecha: ", self)
+        self.txtFecha.move(50, 320)
+        self.txtFecha.setFont(QFont("Arial", 12)) 
+        self.txtFecha.show()
+        #-----------------------------FIN------------------------------#
+
+#---------------------Apartado para seleccionar la fecha en el Apartado Incidencias---------------------#
+        self.seleccionarFecha = QDateEdit(self) 
+        self.seleccionarFecha.move(150,320)
+        self.seleccionarFecha.resize(140, 30)
+        self.seleccionarFecha.setFont(QFont("Arial", 12))
+        self.seleccionarFecha.setCalendarPopup(True)
+        self.seleccionarFecha.setDate(QDate.currentDate())
+        self.seleccionarFecha.show()
+        #-----------------------------FIN------------------------------#
+
+        #---------------------El boton de Registrarse en el Apartado Registrar---------------------#
+        self.confirmarIncidencia = QPushButton("Confirmar", self)
+        self.confirmarIncidencia.resize(100,30)
+        self.confirmarIncidencia.setFont(QFont("Arial", 12))
+        self.confirmarIncidencia.move(100,255)
+        self.confirmarIncidencia.show()
+        self.confirmarIncidencia.clicked.connect(insertarIncidencia)
+    #-----------------------------FIN------------------------------#
