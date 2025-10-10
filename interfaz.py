@@ -11,7 +11,9 @@ class interfazUsuario(QWidget) :
         #---------------------Label Iniciar Sesion---------------------#
         self.txtIniciarSesion = QLabel("Iniciar Sesion", self)
         self.txtIniciarSesion.move(100, 80)
-        self.txtIniciarSesion.setFont(QFont("Arial", 12, QFont.Bold))
+        font = QFont("Arial", 14, QFont.Bold)
+        font.setUnderline(True)
+        self.txtIniciarSesion.setFont(font)
         #-----------------------------FIN------------------------------#
 
 
@@ -27,14 +29,14 @@ class interfazUsuario(QWidget) :
         #---------------------Label Correo en el Apartado Iniciar Sesion---------------------#
         self.txtCorreoIS = QLabel("Correo: ", self)
         self.txtCorreoIS.move(40, 118)
-        self.txtCorreoIS.setFont(QFont("Arial", 12)) 
+        self.txtCorreoIS.setFont(QFont("Arial", 12, QFont.Bold)) 
         #-----------------------------FIN------------------------------#
 
 
         #---------------------Label Contraseña en el Apartado Iniciar Sesion---------------------#
         self.txtPassword = QLabel("Contraseña: ", self)
         self.txtPassword.move(40, 173)
-        self.txtPassword.setFont(QFont("Arial", 12)) 
+        self.txtPassword.setFont(QFont("Arial", 12, QFont.Bold)) 
         #-----------------------------FIN------------------------------#
 
 
@@ -56,18 +58,18 @@ class interfazUsuario(QWidget) :
 
 
         #---------------------El boton de Iniciar Sesion en el Apartado Iniciar Sesion---------------------#
-        self.iniciarSesion = QPushButton("Iniciar Sesión", self)
-        self.iniciarSesion.resize(120,30)
-        self.iniciarSesion.setFont(QFont("Arial", 12))
-        self.iniciarSesion.move(140,215)
-        self.iniciarSesion.clicked.connect(self.verificarCorreoYPassword) # Los click intentar mantenerlos siempre al lado porque si no, da errores
+        self.iniciarSesionBoton = QPushButton("Iniciar Sesión", self)
+        self.iniciarSesionBoton.resize(120,30)
+        self.iniciarSesionBoton.setFont(QFont("Arial", 12, QFont.Bold))
+        self.iniciarSesionBoton.move(140,215)
+        self.iniciarSesionBoton.clicked.connect(self.verificarCorreoYPassword) # Los click intentar mantenerlos siempre al lado porque si no, da errores
         #-----------------------------FIN------------------------------#
 
 
         #---------------------El boton de Registrar en el Apartado Iniciar Sesion---------------------#
         self.registrarse = QPushButton("Registrar", self)
         self.registrarse.resize(90,30)
-        self.registrarse.setFont(QFont("Arial", 12))
+        self.registrarse.setFont(QFont("Arial", 12, QFont.Bold))
         self.registrarse.move(40,215)
         self.registrarse.clicked.connect(self.registrar) #Se llama al metodo registrar
         #-----------------------------FIN------------------------------#
@@ -85,7 +87,7 @@ class interfazUsuario(QWidget) :
         self.password.hide()
         self.txtCorreoIS.hide()
         self.txtPassword.hide()
-        self.iniciarSesion.hide()
+        self.iniciarSesionBoton.hide()
         self.registrarse.hide()
         #-----------------------------FIN------------------------------#
 
@@ -108,7 +110,7 @@ class interfazUsuario(QWidget) :
         #---------------------Label Correo en el Apartado Registrar---------------------#
         self.txtCorreo = QLabel("Correo: ", self)
         self.txtCorreo.move(40, 60)
-        self.txtCorreo.setFont(QFont("Arial", 12)) 
+        self.txtCorreo.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtCorreo.show()
         #-----------------------------FIN------------------------------#
 
@@ -125,7 +127,7 @@ class interfazUsuario(QWidget) :
         #---------------------Label Contraseña en el Apartado Registrar---------------------#
         self.txtPasswordRegistro = QLabel("Contraseña: ", self)
         self.txtPasswordRegistro.move(40, 120)
-        self.txtPasswordRegistro.setFont(QFont("Arial", 12)) 
+        self.txtPasswordRegistro.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtPasswordRegistro.show()
         #-----------------------------FIN------------------------------#
 
@@ -143,7 +145,7 @@ class interfazUsuario(QWidget) :
         #---------------------Label Repetir Contraseña en el Apartado Registrar---------------------#
         self.txtConfirmarPasswordRegistro = QLabel("Repite la Contraseña: ", self)
         self.txtConfirmarPasswordRegistro.move(40, 173)
-        self.txtConfirmarPasswordRegistro.setFont(QFont("Arial", 12)) 
+        self.txtConfirmarPasswordRegistro.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtConfirmarPasswordRegistro.show()
         #-----------------------------FIN------------------------------#
 
@@ -161,13 +163,40 @@ class interfazUsuario(QWidget) :
         #---------------------El boton de Registrarse en el Apartado Registrar---------------------#
         self.registrarse2 = QPushButton("Registrarse", self)
         self.registrarse2.resize(100,30)
-        self.registrarse2.setFont(QFont("Arial", 12))
-        self.registrarse2.move(100,255)
+        self.registrarse2.setFont(QFont("Arial", 12, QFont.Bold))
+        self.registrarse2.move(190,255)
         self.registrarse2.show()
         self.registrarse2.clicked.connect(self.verificarCorreo)# Llamamos el metodo verificarCorreo
     #-----------------------------FIN------------------------------#
 
+    #---------------------El boton de Registrarse en el Apartado Registrar---------------------#
+        self.volver = QPushButton("Volver", self)
+        self.volver.resize(60,30)
+        self.volver.setFont(QFont("Arial", 12, QFont.Bold))
+        self.volver.move(10,255)
+        self.volver.show()
+        self.volver.clicked.connect(self.volverInicioSesion)# Llamamos el metodo verificarCorreo
+    #-----------------------------FIN------------------------------#
 
+    def volverInicioSesion(self):
+        self.txtRegistrarse.hide()
+        self.txtCorreo.hide()
+        self.correoRegistro.hide()
+        self.txtPasswordRegistro.hide()
+        self.passwordRegistro.hide()
+        self.registrarse2.hide()
+        self.txtConfirmarPasswordRegistro.hide()
+        self.confirmarPasswordRegistro.hide()
+        self.txtIniciarSesion.show()
+        self.CorreoIS.show()
+        self.password.show()
+        self.txtCorreoIS.show()
+        self.txtPassword.show()
+        self.iniciarSesionBoton.show()
+        self.registrarse.show()
+        self.CorreoIS.clear()
+        self.password.clear()
+        self.volver.hide()
 
     #---------------------Metodo para la creacion de Usuario, se usara en el metodo validarYCrearUsuario---------------------#
     def crearUsuario(self):
@@ -193,7 +222,7 @@ class interfazUsuario(QWidget) :
         self.password.show()
         self.txtCorreoIS.show()
         self.txtPassword.show()
-        self.iniciarSesion.show()
+        self.iniciarSesionBoton.show()
         self.registrarse.show()
         self.CorreoIS.clear()
         self.password.clear()
@@ -302,21 +331,23 @@ class interfazUsuario(QWidget) :
 
     def incidencias(self):
         self.setWindowTitle("Incidencias")
-        self.setGeometry(200,200,500,500)
+        self.setGeometry(200,200,350,350)
+        self.move(800,400)
         self.txtIniciarSesion.hide()
         self.CorreoIS.hide()
         self.password.hide()
         self.txtCorreoIS.hide()
         self.txtPassword.hide()
-        self.iniciarSesion.hide()
+        self.iniciarSesionBoton.hide()
         self.registrarse.hide()
+
  #-----------------------------FIN------------------------------#
 
 
  #---------------------Label Titulo en el Apartado Incidencias---------------------#
         self.txtTitulo = QLabel("Titulo: ", self)
-        self.txtTitulo.move(50, 140)
-        self.txtTitulo.setFont(QFont("Arial", 12)) 
+        self.txtTitulo.move(10, 40)
+        self.txtTitulo.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtTitulo.show()
 #-----------------------------FIN------------------------------#
 
@@ -331,7 +362,7 @@ class interfazUsuario(QWidget) :
 #---------------------Label Descripcion en el Apartado Incidencias---------------------#
         self.txtDescripcion = QLabel("Descripción: ", self)
         self.txtDescripcion.move(50, 180)
-        self.txtDescripcion.setFont(QFont("Arial", 12)) 
+        self.txtDescripcion.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtDescripcion.show()
         #-----------------------------FIN------------------------------#
 
@@ -346,7 +377,7 @@ class interfazUsuario(QWidget) :
 #---------------------Label Gravedad en el Apartado Incidencias---------------------#
         self.txtGravedad = QLabel("Gravedad: ", self)
         self.txtGravedad.move(50, 280)
-        self.txtGravedad.setFont(QFont("Arial", 12)) 
+        self.txtGravedad.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtGravedad.show()
         #-----------------------------FIN------------------------------#
 
@@ -362,7 +393,7 @@ class interfazUsuario(QWidget) :
 #---------------------Label Fecha en el Apartado Incidencias---------------------#
         self.txtFecha = QLabel("Fecha: ", self)
         self.txtFecha.move(50, 320)
-        self.txtFecha.setFont(QFont("Arial", 12)) 
+        self.txtFecha.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtFecha.show()
         #-----------------------------FIN------------------------------#
 
@@ -379,7 +410,7 @@ class interfazUsuario(QWidget) :
         #---------------------El boton de Registrarse en el Apartado Registrar---------------------#
         self.confirmarIncidencia = QPushButton("Confirmar", self)
         self.confirmarIncidencia.resize(100,30)
-        self.confirmarIncidencia.setFont(QFont("Arial", 12))
+        self.confirmarIncidencia.setFont(QFont("Arial", 12, QFont.Bold))
         self.confirmarIncidencia.move(100,255)
         self.confirmarIncidencia.show()
         self.confirmarIncidencia.clicked.connect(insertarIncidencia)
