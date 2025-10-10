@@ -1,18 +1,22 @@
 import random
 import string
-#def idAzarUsuario(): Voy a USAR ESTO DESPUES PARA LA PARTE DE INCIDENCIAS.
-    #from baseDeDatos import vistaIdUsuario
-    #ids = vistaIdUsuario()
-    #idsUsuarios = []
-    #for i in ids:
-    #   idsUsuarios.append(i[0])
+def idAzarIncidencia(): 
+    from baseDeDatos import vistaIdIncidencia
+    ids = vistaIdIncidencia()
+    idsIncidencia = []
+    for i in ids:
+        idsIncidencia.append(i[0])
 
-    #caracteres = string.ascii_letters + string.digits
-    #while True:
-    #    id_usuario = ""
-    #   for i in range(12):
-    #       id_usuario = id_usuario + random.choice(caracteres)
-    #   if id_usuario in idsUsuarios:
-    #       continue
-    #   else: 
-    #       return id_usuario
+    caracteres = string.ascii_letters + string.digits
+
+    while True:
+        idIncidencia = ""
+        # Generar ID completo de 12 caracteres
+        for i in range(12):
+            idIncidencia += random.choice(caracteres)
+
+        # Verificar si ya existe en la base de datos
+        if idIncidencia in idsIncidencia:
+            continue  # Repetir el bucle para generar uno nuevo
+        else:
+            return idIncidencia
