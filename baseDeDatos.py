@@ -20,13 +20,15 @@ def baseDeDatos():
         Correo VARCHAR(100),
         ID_Incidencia VARCHAR(12),
         Titulo VARCHAR(40),
-        Descripcion VARCHAR(200),
+        Descripcion VARCHAR(400),
         Gravedad VARCHAR(10),
         Fecha DATETIME NOT NULL,
         Estado VARCHAR(7),
+        Categoria VARCHAR(8),
         CONSTRAINT PK_IDINCIDENCIAS PRIMARY KEY (ID_Incidencia),
         CONSTRAINT CHK_GRAVEDAD CHECK (Gravedad IN ('Baja', 'Media', 'Alta', 'Grave', 'Muy Grave')),
         CONSTRAINT CHK_ESTADO CHECK (Estado IN ('ABIERTO', 'CERRADO')),
+        CONSTRAINT CHK_CATEGORIA CHECK (Categoria IN ('HARDWARE', 'SOFTWARE')),
         CONSTRAINT FK_INCIDENCIA FOREIGN KEY (Correo) REFERENCES Usuarios (Correo) ON UPDATE CASCADE
     )
     """)
@@ -41,6 +43,17 @@ def vistaCorreo():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
     consulta = ("Select correo from Usuarios")
+    cursor.execute(consulta)
+    resultados = cursor.fetchall()
+    conexion.close()
+    return resultados
+#-----------------------------FIN------------------------------#
+
+#---------------------Metodo para ver el correo de la tabla usuarios---------------------# 
+def vistaIdIncidencia():
+    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
+    cursor = conexion.cursor()
+    consulta = ("Select ID_Incidencia from Incidencias")
     cursor.execute(consulta)
     resultados = cursor.fetchall()
     conexion.close()
@@ -75,17 +88,16 @@ def insertarUsuario(correo, password):
 #-----------------------------FIN------------------------------#
 
 #---------------------Añadir nuevas incidencias a la base de datos---------------------# 
-def insertarIncidencia(iD_Incidencias, titulo, descripcion, gravedad, fecha):
-    correo = "1" #Necesitamos una manera de conseguir el correo del usuario que está añadiendo la incidencia
-    print("hola")
+def insertarIncidencia(correo,iD_Incidencias, titulo, descripcion, gravedad, fecha, categoria):
     consulta = (
-    "INSERT INTO INCIDENCIAS (Correo, ID_Incidencias, Titulo, Descripcion, Gravedad, Fecha, Estado) VALUES ('"
+    "INSERT INTO INCIDENCIAS (Correo, ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Categoria, Estado) VALUES ('"
     + correo + "', '"
     + iD_Incidencias + "', '"
     + titulo + "', '"
     + descripcion + "', '"
     + gravedad + "', '"
-    + fecha + "', 'ABIERTO')"
+    + fecha + "', '"
+    + categoria + "', 'ABIERTO')"
     )
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
@@ -95,7 +107,7 @@ def insertarIncidencia(iD_Incidencias, titulo, descripcion, gravedad, fecha):
 #-----------------------------FIN------------------------------#
 
 #---------------------Borrar incidencias a la base de datos---------------------# 
-def insertarIncidencia(iD_Incidencias):
+def eliminarIncidencia(iD_Incidencias):
     #Necesitamos sacar el id_incidencia de la incidencia seleccionada para eliminar
     consulta = (
     "DELETE FROM INCIDENCIAS WHERE ID_Incidencia LIKE '" 
