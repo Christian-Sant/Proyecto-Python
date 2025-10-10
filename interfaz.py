@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget # type: ignore
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QToolButton,QAction,QMenu # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
 from PyQt5.QtCore import QDate #type: ignore
 from baseDeDatos import insertarUsuario, insertarIncidencia
@@ -310,6 +310,9 @@ class interfazUsuario(QWidget) :
         self.txtPassword.hide()
         self.iniciarSesion.hide()
         self.registrarse.hide()
+        self.tabla.hide()
+        self.boton_filtro.hide()
+        self.crearincidencias.hide()
  #-----------------------------FIN------------------------------#
 
 
@@ -387,9 +390,9 @@ class interfazUsuario(QWidget) :
 
     def vista(self):
         self.setWindowTitle("Visualización")
-        self.setGeometry(200,200,700,500)
-        self.move(800,400)
-        
+        self.setGeometry(200, 200, 700, 500)
+        self.move(800, 400)
+
         # Ocultar widgets existentes
         self.txtIniciarSesion.hide()
         self.CorreoIS.hide()
@@ -400,17 +403,56 @@ class interfazUsuario(QWidget) :
         self.registrarse.hide()
 
         # Botón
-        self.registrarse2 = QPushButton("Crear incidencia", self)
-        self.registrarse2.resize(170,30)
-        self.registrarse2.setFont(QFont("Arial", 12))
-        self.registrarse2.move(500,450)
-        self.registrarse2.show()
-        self.registrarse2.clicked.connect(self.incidencias)
+        self.crearincidencias = QPushButton("Crear incidencia", self)
+        self.crearincidencias.resize(170, 30)
+        self.crearincidencias.setFont(QFont("Arial", 12))
+        self.crearincidencias.move(500, 450)
+        self.crearincidencias.show()
+        self.crearincidencias.clicked.connect(self.incidencias)
 
         # Tabla
-        self.tabla = QTableWidget(self)  # ← Crear correctamente
-        self.tabla.setGeometry(50, 50, 680, 400)  # Ajusta tamaño y posición
-        self.tabla.move(10,50)
+        self.tabla = QTableWidget(self)
+        self.tabla.setGeometry(10, 50, 680, 400)
         self.tabla.setColumnCount(7)
-        self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion","Gravedad","Fecha","Categoria","Estado"])
+        self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion", "Gravedad", "Fecha", "Categoria", "Estado"])
         self.tabla.show()
+
+        # --- Menú desplegable para filtros ---
+
+        # Botón desplegable
+        self.boton_filtro = QToolButton(self)
+        self.boton_filtro.setText("Filtrar")
+        self.boton_filtro.setFont(QFont("Arial", 12))
+        self.boton_filtro.setGeometry(10, 10, 100, 30)
+        self.boton_filtro.setPopupMode(QToolButton.InstantPopup)
+
+        # Menú
+        menu = QMenu()
+
+        # Categoría
+        cat1 = QAction("SOFTWARE", self, checkable=True)
+        cat2 = QAction("HARDWARE", self, checkable=True)
+        menu.addAction(cat1)
+        menu.addAction(cat2)
+
+        menu.addSeparator()
+
+        # Estado
+        est1 = QAction("ABIERTO", self, checkable=True)
+        est2 = QAction("CERRADO", self, checkable=True)
+        menu.addAction(est1)
+        menu.addAction(est2)
+
+        self.boton_filtro.setMenu(menu)
+        self.boton_filtro.show()
+
+        # Conectar señales de actualización (opcional, por ejemplo, para filtrar la tabla)
+        for action in [cat1, cat2, est1, est2]:
+            action.triggered.connect(self.actualizar_filtro)
+
+    # Función para manejar cambios en los checkboxes
+    def actualizar_filtro(self):
+        menu = self.boton_filtro.menu()
+        seleccion = [action.text() for action in menu.actions() if action.isCheckable() and action.isChecked()]
+        print("Opciones seleccionadas:", seleccion)
+        # Aquí puedes filtrar la tabla según la selección

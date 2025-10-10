@@ -95,7 +95,7 @@ def insertarIncidencia(iD_Incidencias, titulo, descripcion, gravedad, fecha):
 #-----------------------------FIN------------------------------#
 
 #---------------------Borrar incidencias a la base de datos---------------------# 
-def insertarIncidencia(iD_Incidencias):
+def eliminarIncidencias(iD_Incidencias):
     #Necesitamos sacar el id_incidencia de la incidencia seleccionada para eliminar
     consulta = (
     "DELETE FROM INCIDENCIAS WHERE ID_Incidencia LIKE '" 
