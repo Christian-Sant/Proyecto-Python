@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit # type: ignore
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
 from PyQt5.QtCore import QDate #type: ignore
 from baseDeDatos import insertarUsuario, insertarIncidencia
@@ -283,7 +283,7 @@ class interfazUsuario(QWidget) :
         if correo in correosPassword:
             if correosPassword[correo] == password:
                 #llamar un metodo(def) de Vicente, la interfaz
-                self.incidencias()
+                self.vista()
                 print("todo bien")
             else:
                 mensajeErrorPassword = QMessageBox()
@@ -384,3 +384,33 @@ class interfazUsuario(QWidget) :
         self.confirmarIncidencia.show()
         self.confirmarIncidencia.clicked.connect(insertarIncidencia)
     #-----------------------------FIN------------------------------#
+
+    def vista(self):
+        self.setWindowTitle("Visualización")
+        self.setGeometry(200,200,700,500)
+        self.move(800,400)
+        
+        # Ocultar widgets existentes
+        self.txtIniciarSesion.hide()
+        self.CorreoIS.hide()
+        self.password.hide()
+        self.txtCorreoIS.hide()
+        self.txtPassword.hide()
+        self.iniciarSesion.hide()
+        self.registrarse.hide()
+
+        # Botón
+        self.registrarse2 = QPushButton("Crear incidencia", self)
+        self.registrarse2.resize(170,30)
+        self.registrarse2.setFont(QFont("Arial", 12))
+        self.registrarse2.move(500,450)
+        self.registrarse2.show()
+        self.registrarse2.clicked.connect(self.incidencias)
+
+        # Tabla
+        self.tabla = QTableWidget(self)  # ← Crear correctamente
+        self.tabla.setGeometry(50, 50, 680, 400)  # Ajusta tamaño y posición
+        self.tabla.move(10,50)
+        self.tabla.setColumnCount(7)
+        self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion","Gravedad","Fecha","Categoria","Estado"])
+        self.tabla.show()
