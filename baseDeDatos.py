@@ -87,7 +87,21 @@ def insertarIncidencia(iD_Incidencias, titulo, descripcion, gravedad, fecha):
     + gravedad + "', '"
     + fecha + "', 'ABIERTO')"
     )
+    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
+    cursor = conexion.cursor()
+    cursor.execute(consulta)
+    conexion.commit()
+    conexion.close()
+#-----------------------------FIN------------------------------#
 
+#---------------------Borrar incidencias a la base de datos---------------------# 
+def insertarIncidencia(iD_Incidencias):
+    #Necesitamos sacar el id_incidencia de la incidencia seleccionada para eliminar
+    consulta = (
+    "DELETE FROM INCIDENCIAS WHERE ID_Incidencia LIKE '" 
+    + iD_Incidencias
+    + "';"
+    )
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
     cursor.execute(consulta)
