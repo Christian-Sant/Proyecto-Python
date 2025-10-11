@@ -318,6 +318,24 @@ def insertarIncidencia(correo,iD_Incidencias, titulo, descripcion, gravedad, fec
     conexion.close()
 #-----------------------------FIN------------------------------#
 
+def actualizarIncidencia(id_incidencia, titulo, descripcion, gravedad, fecha, categoria):
+
+    consulta = (
+        "UPDATE INCIDENCIAS SET "
+        "Titulo = '" + titulo + "', "
+        "Descripcion = '" + descripcion + "', "
+        "Gravedad = '" + gravedad + "', "
+        "Fecha = '" + fecha + "', "
+        "Categoria = '" + categoria + "' "
+        "WHERE ID_Incidencia = '" + id_incidencia + "'"
+    )
+
+    conexion = sqlite3.connect("IncidenciasInformaticas.db")
+    cursor = conexion.cursor()
+    cursor.execute(consulta)
+    conexion.commit()
+    conexion.close()
+
 #---------------------Borrar incidencias a la base de datos---------------------# 
 def eliminarIncidencia(iD_Incidencias):
     #Necesitamos sacar el id_incidencia de la incidencia seleccionada para eliminar
