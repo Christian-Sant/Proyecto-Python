@@ -1,6 +1,5 @@
 import sqlite3
 
-
 #---------------------Metodo de la base de datos---------------------# 
 def baseDeDatos():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
@@ -48,6 +47,21 @@ def vistaCorreo():
     conexion.close()
     return resultados
 #-----------------------------FIN------------------------------#
+
+
+
+#---------------------Metodo para ver el correo de la tabla usuarios---------------------# 
+def vistasIncidencias(correoIniciado):
+    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
+    cursor = conexion.cursor()
+    consulta = ("Select ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria from Incidencias WHERE Correo = '" + correoIniciado + "'")
+    cursor.execute(consulta)
+    resultados = cursor.fetchall()
+    conexion.close()
+    return resultados
+#-----------------------------FIN------------------------------#
+
+
 
 #---------------------Metodo para ver el correo de la tabla usuarios---------------------# 
 def vistaIdIncidencia():
