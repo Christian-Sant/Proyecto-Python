@@ -1,25 +1,22 @@
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QAction,QToolButton,QMenu # type: ignore
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QAction,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
 from PyQt5.QtCore import QDate #type: ignore
-from baseDeDatos import insertarUsuario, insertarIncidencia
+from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias
 from utilidades import idAzarIncidencia
 class interfazUsuario(QWidget) :
+
+    #---------------------INICIO---------------------#
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Inicio de Sesión")
         self.setGeometry(200,200,300,300)
         self.move(800,400)
-        
-
-
-
         #---------------------Llamada Iniciar Sesion---------------------#
         self.iniciarSesion()
         #-----------------------------FIN------------------------------
+    #---------------------FIN---------------------#
 
-
-
-     #---------------------Metodo del apartado Iniciar Sesion---------------------#
+    #---------------------Metodo del apartado Iniciar Sesion---------------------#
     def iniciarSesion(self):
 
         #---------------------Label Iniciar Sesion---------------------#
@@ -77,9 +74,7 @@ class interfazUsuario(QWidget) :
         self.registrarse.move(40,215)
         self.registrarse.clicked.connect(self.registrar) #Se llama al metodo registrar
         #-----------------------------FIN------------------------------#
-
     #-----------------------------FIN------------------------------#
-
 
 
     #---------------------Metodo del apartado Registrar---------------------#
@@ -184,6 +179,8 @@ class interfazUsuario(QWidget) :
         self.volver.clicked.connect(self.volverInicioSesion)# Llamamos el metodo verificarCorreo
     #-----------------------------FIN------------------------------#
 
+
+    #---------------------Metodo para ocultar registrar y mostrar el inicio de sesion---------------------#
     def volverInicioSesion(self):
         self.txtRegistrarse.hide()
         self.txtCorreo.hide()
@@ -203,6 +200,8 @@ class interfazUsuario(QWidget) :
         self.CorreoIS.clear()
         self.password.clear()
         self.volver.hide()
+    #-----------------------------FIN------------------------------#
+
 
     #---------------------Metodo para la creacion de Usuario, se usara en el metodo validarYCrearUsuario---------------------#
     def crearUsuario(self):
@@ -211,6 +210,7 @@ class interfazUsuario(QWidget) :
         insertarUsuario(correo, password)
 
         #---------------------Se oculta toda la interfaz del apartado Registro---------------------#
+        self.volver.hide()
         self.txtRegistrarse.hide()
         self.txtCorreo.hide()
         self.correoRegistro.hide()
@@ -233,9 +233,7 @@ class interfazUsuario(QWidget) :
         self.CorreoIS.clear()
         self.password.clear()
         #-----------------------------FIN------------------------------#
-
     #-----------------------------FIN------------------------------#
-
 
 
     #---------------------Metodo para la Creacion y Validacion del Usuario en el apartado Registrar---------------------#    
@@ -277,10 +275,7 @@ class interfazUsuario(QWidget) :
             mensajeErrorPassword.setText("Las contraseñas no coinciden")
             mensajeErrorPassword.exec_()
         #-----------------------------FIN------------------------------#
-
-
     #-----------------------------FIN------------------------------#
-
 
 
     #---------------------Metodo para Verificar si el Correo ya esta registrado en el apartado Registrar---------------------#
@@ -304,7 +299,6 @@ class interfazUsuario(QWidget) :
             mensajeErrorCorreo2.exec_()
         else:
             self.validarYCrearUsuario()#Llamamos el metodo validarYCrearUsuario
-
     #-----------------------------FIN------------------------------#
 
 
@@ -317,6 +311,7 @@ class interfazUsuario(QWidget) :
         password = self.password.text().strip()
         if correo in correosPassword:
             if correosPassword[correo] == password:
+                self.correoIniciado = correo
                 self.vista()
             else:
                 mensajeErrorPassword = QMessageBox()
@@ -330,10 +325,12 @@ class interfazUsuario(QWidget) :
             mensajeErrorCorreo.setWindowTitle("Error")
             mensajeErrorCorreo.setText("Correo no registrado")
             mensajeErrorCorreo.exec_()
-
     #-----------------------------FIN------------------------------#
 
+
+    #---------------------Apartado para la Creacion de Incidencias---------------------#
     def incidencias(self):
+        #---------------------Especificar titulo de la ventana, moldear la geometria y moverla. Tambien esconder el apartado de Inicio de Sesion---------------------#
         self.setWindowTitle("Incidencias")
         self.setGeometry(200,200,350,330)
         self.move(800,400)
@@ -346,19 +343,20 @@ class interfazUsuario(QWidget) :
         self.registrarse.hide()
         self.crearincidencias.hide()
         self.tabla.hide()
-        self.boton_filtro.hide()
+        self.filtro.hide()
+        #-----------------------------FIN------------------------------#
 
-      
- #-----------------------------FIN------------------------------#
 
- #---------------------Label Titulo en el Apartado Incidencias---------------------#
+
+        #---------------------Label Titulo en el Apartado Incidencias---------------------#
         self.txtTitulo = QLabel("Titulo: ", self)
         self.txtTitulo.move(10, 50)
         self.txtTitulo.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtTitulo.show()
-#-----------------------------FIN------------------------------#
+        #-----------------------------FIN------------------------------#
 
-  #---------------------Label Iniciar Sesion---------------------#
+
+        #---------------------Label CREAR INCIDENCIA---------------------#
         self.txtCREARINCIDENCIA = QLabel("CREAR INCIDENCIA", self)
         self.txtCREARINCIDENCIA.move(90, 5)
         font = QFont("Arial", 14, QFont.Bold)
@@ -367,7 +365,8 @@ class interfazUsuario(QWidget) :
         self.txtCREARINCIDENCIA.show()
         #-----------------------------FIN------------------------------#
 
-#---------------------Apartado para escribir el Titulo en el Apartado Incidencias---------------------#
+
+        #---------------------Apartado para escribir el Titulo en el Apartado Incidencias---------------------#
         self.escribirTitulo = QLineEdit(self) 
         self.escribirTitulo.move(70,50)
         self.escribirTitulo.resize(220, 20)
@@ -375,12 +374,14 @@ class interfazUsuario(QWidget) :
         self.escribirTitulo.show()
         #-----------------------------FIN------------------------------#
 
-#---------------------Label Descripcion en el Apartado Incidencias---------------------#
+
+        #---------------------Label Descripcion en el Apartado Incidencias---------------------#
         self.txtDescripcion = QLabel("Descripción: ", self)
         self.txtDescripcion.move(10, 80)
         self.txtDescripcion.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtDescripcion.show()
         #-----------------------------FIN------------------------------#
+
 
         #---------------------Apartado para escribir la Descripcion en el Apartado Incidencias---------------------#
         self.escribirDescripcion = QTextEdit(self) 
@@ -390,14 +391,16 @@ class interfazUsuario(QWidget) :
         self.escribirDescripcion.show()
         #-----------------------------FIN------------------------------#
 
-#---------------------Label Gravedad en el Apartado Incidencias---------------------#
+
+        #---------------------Label Gravedad en el Apartado Incidencias---------------------#
         self.txtGravedad = QLabel("Gravedad: ", self)
         self.txtGravedad.move(10, 175)
         self.txtGravedad.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtGravedad.show()
         #-----------------------------FIN------------------------------#
 
-#---------------------Apartado para seleccionar la Gravedad en el Apartado Incidencias---------------------#
+
+        #---------------------Apartado para seleccionar la Gravedad en el Apartado Incidencias---------------------#
         self.seleccionarGravedad = QComboBox(self) 
         self.seleccionarGravedad.move(95,170)
         self.seleccionarGravedad.resize(100, 30)
@@ -406,14 +409,16 @@ class interfazUsuario(QWidget) :
         self.seleccionarGravedad.show()
         #-----------------------------FIN------------------------------#
 
-#---------------------Label Fecha en el Apartado Incidencias---------------------#
+
+        #---------------------Label Fecha en el Apartado Incidencias---------------------#
         self.txtFecha = QLabel("Fecha: ", self)
         self.txtFecha.move(10, 215)
         self.txtFecha.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtFecha.show()
         #-----------------------------FIN------------------------------#
 
-#---------------------Apartado para seleccionar la fecha en el Apartado Incidencias---------------------#
+
+        #---------------------Apartado para seleccionar la fecha en el Apartado Incidencias---------------------#
         self.seleccionarFecha = QDateEdit(self) 
         self.seleccionarFecha.move(70,210)
         self.seleccionarFecha.resize(110, 30)
@@ -423,14 +428,16 @@ class interfazUsuario(QWidget) :
         self.seleccionarFecha.show()
         #-----------------------------FIN------------------------------#
 
-        #---------------------Label Fecha en el Apartado Incidencias---------------------#
+
+        #---------------------Label Categoria en el Apartado Incidencias---------------------#
         self.txtCategoria = QLabel("Categoria: ", self)
         self.txtCategoria.move(10, 255)
         self.txtCategoria.setFont(QFont("Arial", 12, QFont.Bold)) 
         self.txtCategoria.show()
         #-----------------------------FIN------------------------------#
 
-#---------------------Apartado para seleccionar la fecha en el Apartado Incidencias---------------------#
+
+        #---------------------Apartado para seleccionar la Categoria en el Apartado Incidencias---------------------#
         self.seleccionarCategoria = QComboBox(self) 
         self.seleccionarCategoria.move(95,250)
         self.seleccionarCategoria.resize(120, 30)
@@ -439,17 +446,20 @@ class interfazUsuario(QWidget) :
         self.seleccionarCategoria.show()
         #-----------------------------FIN------------------------------#
 
-        #---------------------El boton de Registrarse en el Apartado Registrar---------------------#
+
+        #---------------------El boton de Confirmacion para la creacion de la Incidencia---------------------#
         self.confirmarIncidencia = QPushButton("Confirmar", self)
         self.confirmarIncidencia.resize(100,30)
         self.confirmarIncidencia.setFont(QFont("Arial", 12, QFont.Bold))
         self.confirmarIncidencia.move(235,290)
         self.confirmarIncidencia.show()
         self.confirmarIncidencia.clicked.connect(self.crearIncidencia)
-       
-    #-----------------------------FIN------------------------------#
+        #-----------------------------FIN------------------------------#
+    #-----------------------------FIN------------------------------#   
+
+
+    #---------------------Metodo para recopilar toda la informacion necesaria para la creacion de una incidencia---------------------#
     def crearIncidencia(self):
-        correo = self.CorreoIS.text().strip()
         id = idAzarIncidencia()
         titulo = self.escribirTitulo.text().strip()
         descripcion = self.escribirDescripcion.toPlainText().strip()
@@ -457,34 +467,74 @@ class interfazUsuario(QWidget) :
         fecha = self.seleccionarFecha.date().toString("yyyy-MM-dd")
         categoria = self.seleccionarCategoria.currentText().strip()
         if titulo != "" and descripcion != "":
-            insertarIncidencia(correo,id, titulo, descripcion, gravedad, fecha, categoria)
+            insertarIncidencia(self.correoIniciado,id, titulo, descripcion, gravedad, fecha, categoria)
+            self.mostrarVista()
+
+        #---------------------Damos un mensaje de error si le falta el titulo---------------------# 
         elif titulo == "" and descripcion != "":
             mensajeErrorTitulo = QMessageBox()
             mensajeErrorTitulo.setIcon(QMessageBox.Warning)
             mensajeErrorTitulo.setWindowTitle("Error")
             mensajeErrorTitulo.setText("Te falta el titulo")
             mensajeErrorTitulo.exec_()
+        #-----------------------------FIN------------------------------# 
+
+
+        #---------------------Damos un mensaje de error si le falta la descripcion---------------------# 
         elif titulo != "" and descripcion == "":
             mensajeErrorDescripcion = QMessageBox()
             mensajeErrorDescripcion.setIcon(QMessageBox.Warning)
             mensajeErrorDescripcion.setWindowTitle("Error")
             mensajeErrorDescripcion.setText("Te falta la descripción")
             mensajeErrorDescripcion.exec_()
+        #-----------------------------FIN------------------------------# 
+
+
+        #---------------------Damos un mensaje de error si le falta el titulo y la descripcion--------------------#     
         else:
             mensajeErrorTituloDescripcion = QMessageBox()
             mensajeErrorTituloDescripcion.setIcon(QMessageBox.Warning)
             mensajeErrorTituloDescripcion.setWindowTitle("Error")
             mensajeErrorTituloDescripcion.setText("Te falta la titulo y la descripción")
             mensajeErrorTituloDescripcion.exec_()
-        
-        
+        #-----------------------------FIN------------------------------# 
+    #-----------------------------FIN------------------------------#         
 
+
+    #---------------------Metodo para mostrar el apartado de vistas---------------------#    
+    def mostrarVista(self):
+
+        #---------------------Ocultamos el apartado de Creacion de Incidencias y mostramos la vista---------------------#  
+        self.txtTitulo.hide()
+        self.txtCREARINCIDENCIA.hide()
+        self.escribirTitulo.hide()
+        self.txtDescripcion.hide()
+        self.escribirDescripcion.hide()
+        self.txtGravedad.hide()
+        self.seleccionarGravedad.hide()
+        self.txtFecha.hide()
+        self.seleccionarFecha.hide()
+        self.txtCategoria.hide()
+        self.seleccionarCategoria.hide()
+        self.confirmarIncidencia.hide()
+        self.cargar_tabla()
+        self.crearincidencias.show()
+        self.tabla.show()
+        self.filtro.show()
+        self.setWindowTitle("Visualización")
+        self.setGeometry(200, 200, 737, 540)
+        self.move(600, 300)
+        #-----------------------------FIN------------------------------# 
+    #-----------------------------FIN------------------------------#     
+
+
+    #-----------------------------Apartado para el visual de las Incidencias------------------------------# 
     def vista(self):
         self.setWindowTitle("Visualización")
-        self.setGeometry(200, 200, 700, 500)
-        self.move(800, 400)
+        self.setGeometry(200, 200, 737, 540)
+        self.move(600, 300)
 
-        # Ocultar widgets existentes
+        #-----------------------------Ocultamos el apartado de Inicio de Sesion------------------------------# 
         self.txtIniciarSesion.hide()
         self.CorreoIS.hide()
         self.password.hide()
@@ -492,62 +542,78 @@ class interfazUsuario(QWidget) :
         self.txtPassword.hide()
         self.iniciarSesionBoton.hide()
         self.registrarse.hide()
-        
+        #-----------------------------FIN------------------------------# 
 
 
-        # Botón
+        #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
         self.crearincidencias = QPushButton("Crear incidencia", self)
         self.crearincidencias.resize(170, 30)
         self.crearincidencias.setFont(QFont("Arial", 12))
-        self.crearincidencias.move(520, 460)
+        self.crearincidencias.move(557, 500)
         self.crearincidencias.show()
         self.crearincidencias.clicked.connect(self.incidencias)
+        #-----------------------------FIN------------------------------# 
 
-        # Tabla
+
+        #-----------------------------Creacion de la tabla para poder visualizar los datos de las incidencias------------------------------# 
         self.tabla = QTableWidget(self)
-        self.tabla.setGeometry(10, 50, 680, 400)
+        self.tabla.setGeometry(10, 90, 717, 400)
         self.tabla.setColumnCount(7)
         self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion", "Gravedad", "Fecha", "Categoria", "Estado"])
         self.tabla.show()
+        self.cargar_tabla()
+        #-----------------------------FIN------------------------------# 
 
-        # --- Menú desplegable para filtros ---
+       
 
-        # Botón desplegable
-        self.boton_filtro = QToolButton(self)
-        self.boton_filtro.setText("Filtrar:")
-        self.boton_filtro.setFont(QFont("Arial", 12))
-        self.boton_filtro.setGeometry(10, 10, 100, 25)
-        self.boton_filtro.move(590,22)
-        self.boton_filtro.setPopupMode(QToolButton.InstantPopup)
+        #-----------------------------Creacion del boton para poder seleccionar el filtrado------------------------------# 
+        self.filtro = QToolButton(self)
+        self.filtro.setText("FILTRAR")
+        self.filtro.setFont(QFont("Arial", 12))
+        self.filtro.setGeometry(10, 10, 100, 25)
+        self.filtro.move(10,62)
+        self.filtro.setPopupMode(QToolButton.InstantPopup)
+        #-----------------------------FIN------------------------------# 
 
-        # Menú
-        menu = QMenu()
 
-        # Categoría
-        cat1 = QAction("SOFTWARE", self, checkable=True)
-        cat2 = QAction("HARDWARE", self, checkable=True)
-        menu.addAction(cat1)
-        menu.addAction(cat2)
+        #-----------------------------Creacion del menu con checkbox------------------------------# 
+        menu = QMenu(self)
+
+        # Sección de categorías
+        for texto in ["SOFTWARE", "HARDWARE"]:
+            chk = QCheckBox(texto)
+            action = QWidgetAction(menu)
+            action.setDefaultWidget(chk)
+            menu.addAction(action)
 
         menu.addSeparator()
 
-        # Estado
-        est1 = QAction("ABIERTO", self, checkable=True)
-        est2 = QAction("CERRADO", self, checkable=True)
-        menu.addAction(est1)
-        menu.addAction(est2)
+        # Sección de estados
+        for texto in ["ABIERTO", "CERRADO"]:
+            chk = QCheckBox(texto)
+            action = QWidgetAction(menu)
+            action.setDefaultWidget(chk)
+            menu.addAction(action)
 
-        self.boton_filtro.setMenu(menu)
-        self.boton_filtro.show()
+        self.filtro.setMenu(menu)
+        self.filtro.show()
+        #-----------------------------FIN------------------------------#
 
-        # Conectar señales de actualización (opcional, por ejemplo, para filtrar la tabla)
-        for action in [cat1, cat2, est1, est2]:
-            action.triggered.connect(self.actualizar_filtro)
+        # Función para manejar cambios en los checkboxes
+    #-----------------------------FIN------------------------------#
 
-    # Función para manejar cambios en los checkboxes
-    def actualizar_filtro(self):
-        menu = self.boton_filtro.menu()
-        seleccion = [action.text() for action in menu.actions() if action.isCheckable() and action.isChecked()]
-        print("Opciones seleccionadas:", seleccion)
-        # Aquí puedes filtrar la tabla según la selección
+
+    def cargar_tabla(self):
+        datos = vistasIncidencias(self.correoIniciado)  # Trae los datos de la base
+        self.tabla.clearContents()    # Limpia contenido previo
+        self.tabla.setRowCount(len(datos))  # Ajusta filas al número de registros
+
+        for fila_idx, fila_data in enumerate(datos):
+            for col_idx, valor in enumerate(fila_data):
+                item = QTableWidgetItem(str(valor))
+                self.tabla.setItem(fila_idx, col_idx, item)
+
+
+
+        
     
