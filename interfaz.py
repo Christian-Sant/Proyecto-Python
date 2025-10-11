@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QAction,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
 from PyQt5.QtCore import QDate #type: ignore
-from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias
+from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias, filtroSoftware, filtroHardware, filtroAbierto, filtroCerrado,filtroAbiertoCerrado,filtroHardwareAbierto,filtroHardwareAbiertoCerrado,filtroHardwareCerrado,filtroSoftwareAbierto,filtroSoftwareAbiertoCerrado,filtroSoftwareCerrado,filtroSoftwareHardware,filtroSoftwareHardwareAbierto,filtroSoftwareHardwareCerrado
 from utilidades import idAzarIncidencia
 class interfazUsuario(QWidget) :
 
@@ -46,6 +46,7 @@ class interfazUsuario(QWidget) :
         self.CorreoIS.move(40,135)
         self.CorreoIS.resize(220, 20)
         self.CorreoIS.setFont(QFont("Arial", 12))
+        self.CorreoIS.editingFinished.connect(self.validarCorreoInicio)
         #-----------------------------FIN------------------------------#
 
 
@@ -74,6 +75,44 @@ class interfazUsuario(QWidget) :
         self.registrarse.move(40,215)
         self.registrarse.clicked.connect(self.registrar) #Se llama al metodo registrar
         #-----------------------------FIN------------------------------#
+    #-----------------------------FIN------------------------------#
+
+
+    #---------------------Metodo para validar correo---------------------#
+    def validarCorreoInicio(self):
+        texto = self.CorreoIS.text().strip()
+
+        if not texto:
+            return  
+
+        if '@' not in texto:
+            texto = texto.replace("gmail.com", "")
+            texto = texto + "@gmail.com"
+
+        else:
+            nombre = texto.split("@")[0]
+            texto = nombre + "@gmail.com"
+
+        self.CorreoIS.setText(texto)
+    #-----------------------------FIN------------------------------#
+
+
+    #---------------------Metodo para validar correo---------------------#
+    def validarCorreo(self):
+        texto = self.correoRegistro.text().strip()
+
+        if not texto:
+            return  
+       
+        if '@' not in texto:
+            texto = texto.replace("gmail.com", "")
+            texto = texto + "@gmail.com"
+
+        else:
+            nombre = texto.split("@")[0]
+            texto = nombre + "@gmail.com"
+
+        self.correoRegistro.setText(texto)
     #-----------------------------FIN------------------------------#
 
 
@@ -121,6 +160,7 @@ class interfazUsuario(QWidget) :
         self.correoRegistro.move(40,80)
         self.correoRegistro.resize(220, 20)
         self.correoRegistro.setFont(QFont("Arial", 12))
+        self.correoRegistro.editingFinished.connect(self.validarCorreo)
         self.correoRegistro.show()
         #-----------------------------FIN------------------------------#
 
@@ -190,6 +230,7 @@ class interfazUsuario(QWidget) :
         self.registrarse2.hide()
         self.txtConfirmarPasswordRegistro.hide()
         self.confirmarPasswordRegistro.hide()
+        self.setWindowTitle("Inicio de Sesión")
         self.txtIniciarSesion.show()
         self.CorreoIS.show()
         self.password.show()
@@ -203,6 +244,27 @@ class interfazUsuario(QWidget) :
     #-----------------------------FIN------------------------------#
 
 
+    #---------------------Metodo para ocultar vista y mostrar el inicio de sesion---------------------#
+    def volverInicioSesionVista(self):
+        self.crearincidencias.hide()
+        self.grafica.hide()
+        self.cerrarSesion.hide()
+        self.tabla.hide()
+        self.filtro.hide()
+        self.txtIniciarSesion.show()
+        self.CorreoIS.show()
+        self.password.show()
+        self.txtCorreoIS.show()
+        self.txtPassword.show()
+        self.setGeometry(200,200,300,300)
+        self.move(800,400)
+        self.iniciarSesionBoton.show()
+        self.registrarse.show()
+        self.setWindowTitle("Inicio de Sesión")
+        self.CorreoIS.clear()
+        self.password.clear()
+    #-----------------------------FIN------------------------------#
+
     #---------------------Metodo para la creacion de Usuario, se usara en el metodo validarYCrearUsuario---------------------#
     def crearUsuario(self):
         correo = self.correoRegistro.text().strip()
@@ -213,6 +275,7 @@ class interfazUsuario(QWidget) :
         self.volver.hide()
         self.txtRegistrarse.hide()
         self.txtCorreo.hide()
+        self.setWindowTitle("Inicio de Sesión")
         self.correoRegistro.hide()
         self.txtPasswordRegistro.hide()
         self.passwordRegistro.hide()
@@ -517,7 +580,7 @@ class interfazUsuario(QWidget) :
         self.txtCategoria.hide()
         self.seleccionarCategoria.hide()
         self.confirmarIncidencia.hide()
-        self.cargar_tabla()
+        self.filtrototal()
         self.crearincidencias.show()
         self.tabla.show()
         self.filtro.show()
@@ -543,15 +606,44 @@ class interfazUsuario(QWidget) :
         self.iniciarSesionBoton.hide()
         self.registrarse.hide()
         #-----------------------------FIN------------------------------# 
+        
+
+        #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
+        self.crearincidencias = QPushButton("Editar", self)
+        self.crearincidencias.resize(140, 30)
+        self.crearincidencias.setFont(QFont("Arial", 12))
+        self.crearincidencias.move(202, 500)
+        self.crearincidencias.show()
+        self.crearincidencias.clicked.connect(self.incidencias)
+        #-----------------------------FIN------------------------------# 
 
 
         #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
-        self.crearincidencias = QPushButton("Crear incidencia", self)
-        self.crearincidencias.resize(170, 30)
+        self.crearincidencias = QPushButton("Grafico", self)
+        self.crearincidencias.resize(140, 30)
         self.crearincidencias.setFont(QFont("Arial", 12))
-        self.crearincidencias.move(557, 500)
+        self.crearincidencias.move(394, 500)
         self.crearincidencias.show()
         self.crearincidencias.clicked.connect(self.incidencias)
+        #-----------------------------FIN------------------------------# 
+
+        #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
+        self.grafica = QPushButton("Crear incidencia", self)
+        self.grafica.resize(140, 30)
+        self.grafica.setFont(QFont("Arial", 12))
+        self.grafica.move(587, 500)
+        self.grafica.show()
+        self.grafica.clicked.connect(self.incidencias)
+        #-----------------------------FIN------------------------------# 
+
+
+        #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
+        self.cerrarSesion = QPushButton("Cerrar Sesion", self)
+        self.cerrarSesion.resize(130, 30)
+        self.cerrarSesion.setFont(QFont("Arial", 12))
+        self.cerrarSesion.move(10, 500)
+        self.cerrarSesion.show()
+        self.cerrarSesion.clicked.connect(self.volverInicioSesionVista)
         #-----------------------------FIN------------------------------# 
 
 
@@ -559,9 +651,9 @@ class interfazUsuario(QWidget) :
         self.tabla = QTableWidget(self)
         self.tabla.setGeometry(10, 90, 717, 400)
         self.tabla.setColumnCount(7)
-        self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion", "Gravedad", "Fecha", "Categoria", "Estado"])
+        self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion", "Gravedad", "Fecha","Estado","Categoria"])
         self.tabla.show()
-        self.cargar_tabla()
+        self.filtrototal()
         #-----------------------------FIN------------------------------# 
 
        
@@ -577,41 +669,151 @@ class interfazUsuario(QWidget) :
 
 
         #-----------------------------Creacion del menu con checkbox------------------------------# 
-        menu = QMenu(self)
+        self.menu = QMenu(self)
 
-        # Sección de categorías
-        for texto in ["SOFTWARE", "HARDWARE"]:
-            chk = QCheckBox(texto)
-            action = QWidgetAction(menu)
-            action.setDefaultWidget(chk)
-            menu.addAction(action)
+        # --- Sección de categorías ---
+        self.selec1 = QCheckBox("SOFTWARE")
+        self.selec1.stateChanged.connect(self.softwareCambiado)
+        action1 = QWidgetAction(self.menu)
+        action1.setDefaultWidget(self.selec1)
+        self.menu.addAction(action1)
 
-        menu.addSeparator()
+        self.selec2 = QCheckBox("HARDWARE")
+        self.selec2.stateChanged.connect(self.hardwareCambiado)
+        action2 = QWidgetAction(self.menu)
+        action2.setDefaultWidget(self.selec2)
+        self.menu.addAction(action2)
 
-        # Sección de estados
-        for texto in ["ABIERTO", "CERRADO"]:
-            chk = QCheckBox(texto)
-            action = QWidgetAction(menu)
-            action.setDefaultWidget(chk)
-            menu.addAction(action)
+        self.menu.addSeparator()
 
-        self.filtro.setMenu(menu)
+        # --- Sección de estados ---
+        self.selec3 = QCheckBox("ABIERTO")
+        self.selec3.stateChanged.connect(self.abiertoCambiado)
+        action3 = QWidgetAction(self.menu)
+        action3.setDefaultWidget(self.selec3)
+        self.menu.addAction(action3)
+
+        self.selec4 = QCheckBox("CERRADO")
+        self.selec4.stateChanged.connect(self.cerradoCambiado)
+        action4 = QWidgetAction(self.menu)
+        action4.setDefaultWidget(self.selec4)
+        self.menu.addAction(action4)
+
+        self.filtro.setMenu(self.menu)
         self.filtro.show()
+
+
+        
+     
+
         #-----------------------------FIN------------------------------#
-
-        # Función para manejar cambios en los checkboxes
     #-----------------------------FIN------------------------------#
+    calculoSoftware = 0
+    calculoHardware = 0
+    calculoAbierto = 0
+    calculoCerrado = 0
+
+    def filtrototal(self):
+        self.total = self.calculoSoftware + self.calculoHardware + self.calculoAbierto + self.calculoCerrado
+        correo = self.correoIniciado  # Ajusta según cómo guardes el correo activo
+
+        if self.total == 0:
+            self.resultado = vistasIncidencias(correo)
+
+        elif self.total == 1:
+            self.resultado = filtroSoftware(correo)
+
+        elif self.total == 2:
+            self.resultado = filtroHardware(correo)
+
+        elif self.total == 4:
+            self.resultado = filtroAbierto(correo)
+
+        elif self.total == 8:
+            self.resultado = filtroCerrado(correo)
+
+        elif self.total == 3:
+            self.resultado = filtroSoftwareHardware(correo)
+
+        elif self.total == 5:
+            self.resultado = filtroSoftwareAbierto(correo)
+
+        elif self.total == 9:
+            self.resultado = filtroSoftwareCerrado(correo)
+
+        elif self.total == 6:
+            self.resultado = filtroHardwareAbierto(correo)
+
+        elif self.total == 10:
+            self.resultado = filtroHardwareCerrado(correo)
+
+        elif self.total == 12:
+            self.resultado = filtroAbiertoCerrado(correo)
+
+        elif self.total == 7:
+            self.resultado = filtroSoftwareHardwareAbierto(correo)
+
+        elif self.total == 11:
+            self.resultado = filtroSoftwareHardwareCerrado(correo)
+
+        elif self.total == 13:
+            self.resultado = filtroSoftwareAbiertoCerrado(correo)
+
+        elif self.total == 14:
+            self.resultado = filtroHardwareAbiertoCerrado(correo)
+
+        elif self.total == 15:
+            self.resultado = vistasIncidencias(correo)
+
+        else:
+            self.resultado = vistasIncidencias(correo)
+
+        # Aquí puedes actualizar tu tabla o lista con los resultados
+        self.cargar_tabla(self.resultado)
 
 
-    def cargar_tabla(self):
-        datos = vistasIncidencias(self.correoIniciado)  # Trae los datos de la base
-        self.tabla.clearContents()    # Limpia contenido previo
-        self.tabla.setRowCount(len(datos))  # Ajusta filas al número de registros
+
+    def softwareCambiado(self, estado):
+        if estado == 2:
+            self.calculoSoftware = 1
+        else:
+            self.calculoSoftware = 0
+        self.filtrototal()
+
+    def hardwareCambiado(self, estado):
+        if estado == 2:
+            self.calculoHardware = 2
+        else:
+            self.calculoHardware = 0
+        self.filtrototal()
+
+    def abiertoCambiado(self, estado):
+        if estado == 2:
+            self.calculoAbierto = 4
+        else:
+            self.calculoAbierto = 0
+        self.filtrototal()
+
+    def cerradoCambiado(self, estado):
+        if estado == 2:
+            self.calculoCerrado = 8
+        else:
+            self.calculoCerrado = 0
+        self.filtrototal()
+
+            
+
+    # ------------------------- Cargar tabla ------------------------- #
+    def cargar_tabla(self, datos):
+        self.tabla.clearContents()
+        self.tabla.setRowCount(len(datos))
 
         for fila_idx, fila_data in enumerate(datos):
             for col_idx, valor in enumerate(fila_data):
                 item = QTableWidgetItem(str(valor))
                 self.tabla.setItem(fila_idx, col_idx, item)
+
+
 
 
 
