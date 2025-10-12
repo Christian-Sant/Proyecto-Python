@@ -250,6 +250,9 @@ class interfazUsuario(QWidget) :
         self.cerrarSesion.hide()
         self.tabla.hide()
         self.filtro.hide()
+        self.botonAbrir.hide()
+        self.botonCerrar.hide()
+        self.botonEliminar.hide()
         self.txtTituloIncidencias.hide()
         self.txtIniciarSesion.show()
         self.CorreoIS.show()
@@ -692,6 +695,7 @@ class interfazUsuario(QWidget) :
         self.botonEliminar.setFont(QFont("Arial", 12))
         self.botonEliminar.move(202, 58)
         self.botonEliminar.show()
+        self.botonEliminar.clicked.connect(self.eliminar_incidencia)
         #-----------------------------FIN------------------------------# 
 
         #-----------------------------El boton para Abrir una incidencia en el apartado Vista------------------------------# 
@@ -700,6 +704,7 @@ class interfazUsuario(QWidget) :
         self.botonAbrir.setFont(QFont("Arial", 12))
         self.botonAbrir.move(394, 58)
         self.botonAbrir.show()
+        self.botonAbrir.clicked.connect(self.abrir_incidencia)
         #-----------------------------FIN------------------------------#
 
         #-----------------------------El boton para Cerrar una incidencia en el apartado Vista------------------------------# 
@@ -708,6 +713,7 @@ class interfazUsuario(QWidget) :
         self.botonCerrar.setFont(QFont("Arial", 12))
         self.botonCerrar.move(587, 58)
         self.botonCerrar.show()
+        self.botonCerrar.clicked.connect(self.cerrar_incidencia)
         #-----------------------------FIN------------------------------#
 
         #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
@@ -729,7 +735,6 @@ class interfazUsuario(QWidget) :
         self.filtrototal()
         #-----------------------------FIN------------------------------# 
 
-       
 
         #-----------------------------Creacion del boton para poder seleccionar el filtrado------------------------------# 
         self.filtro = QToolButton(self)
@@ -1104,7 +1109,51 @@ class interfazUsuario(QWidget) :
             if index_grav != -1:
                 self.seleccionarGravedad.setCurrentIndex(index_grav)
 
+# ------------------ Método para sacar el id de la incidencia seleccionada ------------------ #
+    def obtener_id_seleccionado(self):
+        fila_seleccionada = self.tabla.currentRow()
+        if fila_seleccionada == -1:
+            QMessageBox.warning(self, "Atención", "Por favor, selecciona una incidencia de la tabla.")
+            return None
 
+        id_item = self.tabla.item(fila_seleccionada, 0)  # Columna 0 = ID
+        if id_item is None:
+            QMessageBox.warning(self, "Error", "No se pudo obtener el ID de la incidencia seleccionada.")
+            return None
+
+        return id_item.text()
+#-----------------------------FIN------------------------------#
+
+# ------------------ Método para el botón eliminarIncidencia ------------------ #
+    def eliminar_incidencia(self):
+        id_incidencia = self.obtener_id_seleccionado()
+        if id_incidencia:
+            respuesta = QMessageBox.question(
+                self,
+                "Confirmar eliminación",
+                f"¿Estás seguro de eliminar la incidencia con ID {id_incidencia}?",
+                QMessageBox.Yes | QMessageBox.No
+            )
+            if respuesta == QMessageBox.Yes:
+                self.eliminarIncidencia(id_incidencia)  
+                self.filtrototal()  # Refresca la tabla
+#-----------------------------FIN------------------------------#
+
+# ------------------ Método para el botón abrirIncidencia ------------------ #
+    def abrir_incidencia(self):
+        id_incidencia = self.obtener_id_seleccionado()
+        if id_incidencia:
+            self.abrirIncidencia(id_incidencia)  
+            self.filtrototal()  # Refresca tabla
+#-----------------------------FIN------------------------------#
+
+# ------------------ Método para el botón cerrarIncidencia ------------------ #
+    def cerrar_incidencia(self):
+        id_incidencia = self.obtener_id_seleccionado()
+        if id_incidencia:
+            self.cerrarIncidencia(id_incidencia)  
+            self.filtrototal()  # Refresca tabla
+#-----------------------------FIN------------------------------#
 
 
 
