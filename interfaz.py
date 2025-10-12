@@ -246,10 +246,11 @@ class interfazUsuario(QWidget) :
 
     #---------------------Metodo para ocultar vista y mostrar el inicio de sesion---------------------#
     def volverInicioSesionVista(self):
-        self.grafica.hide()
+        self.grafico.hide()
         self.cerrarSesion.hide()
         self.tabla.hide()
         self.filtro.hide()
+        self.txtTituloIncidencias.hide()
         self.txtIniciarSesion.show()
         self.CorreoIS.show()
         self.password.show()
@@ -396,13 +397,7 @@ class interfazUsuario(QWidget) :
         self.setWindowTitle("Incidencias")
         self.setGeometry(200,200,350,330)
         self.move(800,400)
-        self.txtIniciarSesion.hide()
-        self.CorreoIS.hide()
-        self.password.hide()
-        self.txtCorreoIS.hide()
-        self.txtPassword.hide()
-        self.iniciarSesionBoton.hide()
-        self.registrarse.hide()
+        self.txtTituloIncidencias.hide()
         self.tabla.hide()
         self.filtro.hide()
         self.editarIncidencias.hide()
@@ -454,6 +449,7 @@ class interfazUsuario(QWidget) :
         self.escribirDescripcion.move(110,80)
         self.escribirDescripcion.resize(220, 80)
         self.escribirDescripcion.setFont(QFont("Arial", 12))
+        self.escribirDescripcion.textChanged.connect(self.actualizarPrediccion)
         self.escribirDescripcion.show()
         #-----------------------------FIN------------------------------#
 
@@ -521,6 +517,13 @@ class interfazUsuario(QWidget) :
         self.confirmarIncidencia.show()
         self.confirmarIncidencia.clicked.connect(self.crearIncidencia)
         #-----------------------------FIN------------------------------#
+
+        self.cancelarIncidencia = QPushButton("Cancelar", self)
+        self.cancelarIncidencia.resize(100,30)
+        self.cancelarIncidencia.setFont(QFont("Arial", 12, QFont.Bold))
+        self.cancelarIncidencia.move(10,290)
+        self.cancelarIncidencia.show()
+        self.cancelarIncidencia.clicked.connect(self.mostrarVista)
     #-----------------------------FIN------------------------------#   
 
 
@@ -578,6 +581,7 @@ class interfazUsuario(QWidget) :
         self.escribirDescripcion.hide()
         self.txtGravedad.hide()
         self.seleccionarGravedad.hide()
+        self.cancelarIncidencia.hide()
         self.txtFecha.hide()
         self.seleccionarFecha.hide()
         self.txtCategoria.hide()
@@ -585,6 +589,7 @@ class interfazUsuario(QWidget) :
         self.confirmarIncidencia.hide()
         self.editarIncidencias.show()
         self.grafico.show()
+        self.txtTituloIncidencias.show()
         self.crearIncidencias.show()
         self.cerrarSesion.show()
         self.filtrototal()
@@ -612,9 +617,11 @@ class interfazUsuario(QWidget) :
         self.txtCategoriaEdit.hide()
         self.seleccionarCategoriaEdit.hide()
         self.confirmarIncidenciaEdit.hide()
+        self.cancelarIncidenciaEdit.hide()
         self.editarIncidencias.show()
         self.grafico.show()
         self.crearIncidencias.show()
+        self.txtTituloIncidencias.show()
         self.cerrarSesion.show()
         self.filtrototal()
         self.tabla.show()
@@ -649,6 +656,16 @@ class interfazUsuario(QWidget) :
         self.editarIncidencias.show()
         self.editarIncidencias.clicked.connect(self.editar)
         #-----------------------------FIN------------------------------# 
+
+
+        #---------------------Label Categoria en el Apartado Incidencias---------------------#
+        self.txtTituloIncidencias = QLabel("INCIDENCIAS", self)
+        self.txtTituloIncidencias.move(295, 10)
+        font = QFont("Arial", 16, QFont.Bold)
+        font.setUnderline(True)
+        self.txtTituloIncidencias.setFont(font) 
+        self.txtTituloIncidencias.show()
+        #-----------------------------FIN------------------------------#
 
 
         #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
@@ -859,7 +876,7 @@ class interfazUsuario(QWidget) :
         fecha = self.tabla.item(fila, 4).text()       
         categoria = self.tabla.item(fila, 6).text() 
         #---------------------Especificar titulo de la ventana, moldear la geometria y moverla. Tambien esconder el apartado de Inicio de Sesion---------------------#
-        self.setWindowTitle("Incidencias")
+        self.setWindowTitle("Editar Incidencia")
         self.setGeometry(200,200,350,330)
         self.move(800,400)
         self.txtIniciarSesion.hide()
@@ -868,6 +885,7 @@ class interfazUsuario(QWidget) :
         self.txtCorreoIS.hide()
         self.txtPassword.hide()
         self.iniciarSesionBoton.hide()
+        self.txtTituloIncidencias.hide()
         self.registrarse.hide()
         self.tabla.hide()
         self.filtro.hide()
@@ -889,8 +907,8 @@ class interfazUsuario(QWidget) :
 
 
         #---------------------Label CREAR INCIDENCIA---------------------#
-        self.txtCREARINCIDENCIAEdit = QLabel("CREAR INCIDENCIA", self)
-        self.txtCREARINCIDENCIAEdit.move(90, 5)
+        self.txtCREARINCIDENCIAEdit = QLabel("EDITAR INCIDENCIA", self)
+        self.txtCREARINCIDENCIAEdit.move(85, 5)
         font = QFont("Arial", 14, QFont.Bold)
         font.setUnderline(True)
         self.txtCREARINCIDENCIAEdit.setFont(font)
@@ -923,6 +941,7 @@ class interfazUsuario(QWidget) :
         self.escribirDescripcionEdit.setFont(QFont("Arial", 12))
         self.escribirDescripcionEdit.show()
         self.escribirDescripcionEdit.setPlainText(descripcion)
+
         #-----------------------------FIN------------------------------#
 
 
@@ -992,6 +1011,14 @@ class interfazUsuario(QWidget) :
         self.confirmarIncidenciaEdit.show()
         self.confirmarIncidenciaEdit.clicked.connect(self.editarIncidencia)
         #-----------------------------FIN------------------------------#
+        #---------------------El boton de Confirmacion para la creacion de la Incidencia---------------------#
+        self.cancelarIncidenciaEdit = QPushButton("Cancelar", self)
+        self.cancelarIncidenciaEdit.resize(100,30)
+        self.cancelarIncidenciaEdit.setFont(QFont("Arial", 12, QFont.Bold))
+        self.cancelarIncidenciaEdit.move(10,290)
+        self.cancelarIncidenciaEdit.show()
+        self.cancelarIncidenciaEdit.clicked.connect(self.mostrarVistaEdit)
+        #-----------------------------FIN------------------------------#
     def editarIncidencia(self):
         tituloReemplazo = self.escribirTituloEdit.text().strip()
         descripcionReemplazo = self.escribirDescripcionEdit.toPlainText().strip()
@@ -1032,6 +1059,28 @@ class interfazUsuario(QWidget) :
         #-----------------------------FIN------------------------------# 
     #-----------------------------FIN------------------------------#         
         
+    def actualizarPrediccion(self):
+        from ia import predecir
+        # Obtener texto actual de la descripción
+        descripcion = self.escribirDescripcion.toPlainText().strip()
+        if descripcion == "":
+            return  # Si está vacío, no hace nada
+
+        # Llamar a la función de predicción de tu IA
+        categoria, gravedad = predecir(descripcion)  # Usa tu función del módulo IA
+
+        if categoria:
+            # Establecer el valor en el QComboBox
+            index_cat = self.seleccionarCategoria.findText(categoria)
+            if index_cat != -1:
+                self.seleccionarCategoria.setCurrentIndex(index_cat)
+
+        if gravedad:
+            # Establecer el valor en el QComboBox
+            index_grav = self.seleccionarGravedad.findText(gravedad)
+            if index_grav != -1:
+                self.seleccionarGravedad.setCurrentIndex(index_grav)
+
 
 
 
