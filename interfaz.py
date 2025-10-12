@@ -784,6 +784,35 @@ class interfazUsuario(QWidget) :
         action9.setDefaultWidget(self.checkboxMuyGrave)
         self.menu.addAction(action9)
 
+        self.menu.addSeparator()
+
+        # Fecha actual
+        hoy = QDate.currentDate()
+
+        # Primer día del mes actual
+        primer_dia = QDate(hoy.year(), hoy.month(), 1)
+
+        # Último día del mes actual
+        ultimo_dia = primer_dia.addMonths(1).addDays(-1)
+
+        # --- Fecha inicio ---
+        self.fechaInicioEdit = QDateEdit(self)
+        self.fechaInicioEdit.setCalendarPopup(True)
+        self.fechaInicioEdit.setDate(primer_dia)  # Primer día del mes
+        actionFechaInicioEdit = QWidgetAction(self.menu)
+        actionFechaInicioEdit.setDefaultWidget(self.fechaInicioEdit)
+        self.menu.addAction(actionFechaInicioEdit)
+
+        # --- Fecha fin ---
+        self.fechaFinEdit = QDateEdit(self)
+        self.fechaFinEdit.setCalendarPopup(True)
+        self.fechaFinEdit.setDate(ultimo_dia)  # Último día del mes
+        actionFechaFinEdit = QWidgetAction(self.menu)
+        actionFechaFinEdit.setDefaultWidget(self.fechaFinEdit)
+        self.menu.addAction(actionFechaFinEdit)
+        self.fechaInicioEdit.dateChanged.connect(self.filtrototal)
+        self.fechaFinEdit.dateChanged.connect(self.filtrototal)
+
         # Asignar el menú al botón
         self.filtro.setMenu(self.menu)
         self.filtro.show()
@@ -817,8 +846,11 @@ class interfazUsuario(QWidget) :
         if self.checkboxMuyGrave.isChecked():
             gravedades.append("Muy Grave")
 
+        fecha_inicio = self.fechaInicioEdit.date().toString("yyyy-MM-dd")
+        fecha_fin = self.fechaFinEdit.date().toString("yyyy-MM-dd")
+
         # Llamada a la base de datos
-        resultados = obtener_incidencias(self.correoIniciado, categorias, estados, gravedades)
+        resultados = obtener_incidencias(self.correoIniciado, categorias, estados, gravedades,fecha_inicio,fecha_fin)
 
         # Actualizar tabla
         self.cargar_tabla(resultados)

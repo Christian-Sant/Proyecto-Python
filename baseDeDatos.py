@@ -75,25 +75,25 @@ def vistaIdIncidencia():
 #-----------------------------FIN------------------------------#
 
 # ------------------- Método en base de datos ------------------- #
-def obtener_incidencias(correo, categorias=[], estados=[], gravedades=[]):
-    consulta = f"SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria " \
-               f"FROM Incidencias WHERE Correo='{correo}'"
+def obtener_incidencias(correo, categorias, estados, gravedades, fecha_inicio=None, fecha_fin=None):
+    consulta = f"SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria FROM Incidencias WHERE Correo='{correo}'"
 
-    # Filtros dinámicos
     if categorias:
         consulta += " AND Categoria IN ('" + "','".join(categorias) + "')"
     if estados:
         consulta += " AND Estado IN ('" + "','".join(estados) + "')"
     if gravedades:
         consulta += " AND Gravedad IN ('" + "','".join(gravedades) + "')"
+    if fecha_inicio and fecha_fin:
+        consulta += f" AND Fecha BETWEEN '{fecha_inicio}' AND '{fecha_fin}'"
 
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
     cursor.execute(consulta)
     resultados = cursor.fetchall()
     conexion.close()
-
     return resultados
+
 
 
 
