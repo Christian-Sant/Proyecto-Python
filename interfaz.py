@@ -8,6 +8,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle #type: ignor
 from reportlab.lib import colors #type: ignore
 from reportlab.lib.pagesizes import letter, landscape #type: ignore
 from grafico import generar_graficas
+from notificacion import Toast
 class interfazUsuario(QWidget) :
 
     #---------------------INICIO---------------------#
@@ -553,6 +554,8 @@ class interfazUsuario(QWidget) :
         if titulo != "" and descripcion != "":
             insertarIncidencia(self.correoIniciado,id, titulo, descripcion, gravedad, fecha, categoria)
             self.mostrarVista()
+            toast = Toast("Incidencia Creada", parent=self)
+            toast.show()  # Refresca tabla
 
         #---------------------Damos un mensaje de error si le falta el titulo---------------------# 
         elif titulo == "" and descripcion != "":
@@ -947,7 +950,8 @@ class interfazUsuario(QWidget) :
                     fila_datos.append(item.text() if item else "")
                 writer.writerow(fila_datos)
 
-        QMessageBox.information(self, "Éxito", "El CSV se ha generado correctamente.")
+        toast = Toast("CSV descargado correctamente", parent=self)
+        toast.show()  # Refresca tabla
 
 
     def descargar_pdf(self):
@@ -998,7 +1002,8 @@ class interfazUsuario(QWidget) :
         # Generar documento
         pdf.build([tabla_pdf])
 
-        QMessageBox.information(self, "Éxito", "El PDF se ha generado correctamente.")
+        toast = Toast("PDF descargado correctamente", parent=self)
+        toast.show()  # Refresca tabla
 
 
     # ------------------------- Cargar tabla ------------------------- #
@@ -1181,6 +1186,8 @@ class interfazUsuario(QWidget) :
         if tituloReemplazo != "" and descripcionReemplazo != "":
             actualizarIncidencia(self.id_incidencia,tituloReemplazo,descripcionReemplazo,gravedadReemplazo,fechaReemplazo,categoriaReemplazo)
             self.mostrarVistaEdit()
+            toast = Toast("Incidencia Editada", parent=self)
+            toast.show()  # Refresca tabla
 
         #---------------------Damos un mensaje de error si le falta el titulo---------------------# 
         elif tituloReemplazo == "" and descripcionReemplazo != "":
@@ -1272,7 +1279,10 @@ class interfazUsuario(QWidget) :
             )
             if respuesta == QMessageBox.Yes:
                 eliminarIncidencia(self.id_incidencia)  
-                self.filtrototal()  # Refresca la tabla
+                self.filtrototal()
+                toast = Toast("Incidencia Eliminada", parent=self)
+                toast.show()
+  # Refresca la tabla
 #-----------------------------FIN------------------------------#
 
 # ------------------ Método para el botón abrirIncidencia ------------------ #
@@ -1286,7 +1296,9 @@ class interfazUsuario(QWidget) :
 
         if self.id_incidencia:
             abrirIncidencia(self.id_incidencia)  
-            self.filtrototal()  # Refresca tabla
+            self.filtrototal()
+            toast = Toast("Incidencia Abierta", parent=self)
+            toast.show()  # Refresca tabla
 #-----------------------------FIN------------------------------#
 
 # ------------------ Método para el botón cerrarIncidencia ------------------ #
@@ -1300,13 +1312,13 @@ class interfazUsuario(QWidget) :
 
         if self.id_incidencia:
             cerrarIncidencia(self.id_incidencia)  
-            self.filtrototal()  # Refresca tabla
+            self.filtrototal()
+            toast = Toast("Incidencia Cerrada", parent=self)
+            toast.show()  # Refresca tabla
 #-----------------------------FIN------------------------------#
 
     def mostrar_estadisticas(self):
         generar_graficas(self.correoIniciado)
-
-
 
 
 

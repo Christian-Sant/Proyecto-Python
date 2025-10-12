@@ -1,7 +1,5 @@
-import sqlite3
 import matplotlib.pyplot as plt #type: ignore
 from baseDeDatos import obtener_estadisticas  # importará las consultas que veremos después
-
 def generar_graficas(correo,nombre_db="IncidenciasInformaticas.db"):
     """
     Genera y muestra tres gráficas de barras:
@@ -60,3 +58,4 @@ def generar_graficas(correo,nombre_db="IncidenciasInformaticas.db"):
 
     plt.tight_layout()
     plt.show()
+    
