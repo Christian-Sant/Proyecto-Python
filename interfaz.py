@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QAction,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
 from PyQt5.QtCore import QDate #type: ignore
-from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias, filtroSoftware, filtroHardware, filtroAbierto, filtroCerrado,filtroAbiertoCerrado,filtroHardwareAbierto,filtroHardwareAbiertoCerrado,filtroHardwareCerrado,filtroSoftwareAbierto,filtroSoftwareAbiertoCerrado,filtroSoftwareCerrado,filtroSoftwareHardware,filtroSoftwareHardwareAbierto,filtroSoftwareHardwareCerrado, actualizarIncidencia
+from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias, filtroSoftware, filtroHardware, filtroAbierto, filtroCerrado,filtroAbiertoCerrado,filtroHardwareAbierto,filtroHardwareAbiertoCerrado,filtroHardwareCerrado,filtroSoftwareAbierto,filtroSoftwareAbiertoCerrado,filtroSoftwareCerrado,filtroSoftwareHardware,filtroSoftwareHardwareAbierto,filtroSoftwareHardwareCerrado, actualizarIncidencia, eliminarIncidencia, abrirIncidencia, cerrarIncidencia
 from utilidades import idAzarIncidencia
 class interfazUsuario(QWidget) :
 
@@ -686,6 +686,29 @@ class interfazUsuario(QWidget) :
         self.crearIncidencias.clicked.connect(self.incidencias)
         #-----------------------------FIN------------------------------# 
 
+        #-----------------------------El boton para eliminar una fila en el apartado Vista------------------------------# 
+        self.botonEliminar = QPushButton("Eliminar", self)
+        self.botonEliminar.resize(140, 30)
+        self.botonEliminar.setFont(QFont("Arial", 12))
+        self.botonEliminar.move(202, 58)
+        self.botonEliminar.show()
+        #-----------------------------FIN------------------------------# 
+
+        #-----------------------------El boton para Abrir una incidencia en el apartado Vista------------------------------# 
+        self.botonAbrir = QPushButton("Abrir", self)
+        self.botonAbrir.resize(140, 30)
+        self.botonAbrir.setFont(QFont("Arial", 12))
+        self.botonAbrir.move(394, 58)
+        self.botonAbrir.show()
+        #-----------------------------FIN------------------------------#
+
+        #-----------------------------El boton para Cerrar una incidencia en el apartado Vista------------------------------# 
+        self.botonCerrar = QPushButton("Cerrar", self)
+        self.botonCerrar.resize(140, 30)
+        self.botonCerrar.setFont(QFont("Arial", 12))
+        self.botonCerrar.move(587, 58)
+        self.botonCerrar.show()
+        #-----------------------------FIN------------------------------#
 
         #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
         self.cerrarSesion = QPushButton("Cerrar Sesion", self)
@@ -1011,7 +1034,7 @@ class interfazUsuario(QWidget) :
         self.confirmarIncidenciaEdit.show()
         self.confirmarIncidenciaEdit.clicked.connect(self.editarIncidencia)
         #-----------------------------FIN------------------------------#
-        #---------------------El boton de Confirmacion para la creacion de la Incidencia---------------------#
+        #---------------------El boton de Cancelacion para la creacion de la Incidencia---------------------#
         self.cancelarIncidenciaEdit = QPushButton("Cancelar", self)
         self.cancelarIncidenciaEdit.resize(100,30)
         self.cancelarIncidenciaEdit.setFont(QFont("Arial", 12, QFont.Bold))

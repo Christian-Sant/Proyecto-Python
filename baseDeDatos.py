@@ -337,14 +337,45 @@ def actualizarIncidencia(id_incidencia, titulo, descripcion, gravedad, fecha, ca
     conexion.close()
 
 #---------------------Borrar incidencias a la base de datos---------------------# 
-def eliminarIncidencia(iD_Incidencias):
-    #Necesitamos sacar el id_incidencia de la incidencia seleccionada para eliminar
+def eliminarIncidencia(id_incidencias):
     consulta = (
     "DELETE FROM INCIDENCIAS WHERE ID_Incidencia LIKE '" 
-    + iD_Incidencias
+    + id_incidencias
     + "';"
     )
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
+    cursor = conexion.cursor()
+    cursor.execute(consulta)
+    conexion.commit()
+    conexion.close()
+#-----------------------------FIN------------------------------#
+
+#---------------------Cambiar a Abierto el estado de una incidencia de la base de datos---------------------#
+def abrirIncidencia(id_incidencia):
+
+    consulta = (
+        "UPDATE INCIDENCIAS SET "
+        "Estado = 'Abierto'"
+        "WHERE ID_Incidencia = '" + id_incidencia + "'"
+    )
+
+    conexion = sqlite3.connect("IncidenciasInformaticas.db")
+    cursor = conexion.cursor()
+    cursor.execute(consulta)
+    conexion.commit()
+    conexion.close()
+#-----------------------------FIN------------------------------#
+
+#---------------------Cambiar a Cerrado el estado de una incidencia de la base de datos---------------------#
+def cerrarIncidencia(id_incidencia):
+
+    consulta = (
+        "UPDATE INCIDENCIAS SET "
+        "Estado = 'Cerrado'"
+        "WHERE ID_Incidencia = '" + id_incidencia + "'"
+    )
+
+    conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
     cursor.execute(consulta)
     conexion.commit()
