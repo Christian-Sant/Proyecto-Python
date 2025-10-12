@@ -74,200 +74,25 @@ def vistaIdIncidencia():
     return resultados
 #-----------------------------FIN------------------------------#
 
-#--------------------- SOLO SOFTWARE ---------------------#
-def filtroSoftware(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'SOFTWARE'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
+# ------------------- Método en base de datos ------------------- #
+def obtener_incidencias(correo, categorias=[], estados=[], gravedades=[]):
+    consulta = f"SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria " \
+               f"FROM Incidencias WHERE Correo='{correo}'"
 
-#--------------------- SOLO HARDWARE ---------------------#
-def filtroHardware(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'HARDWARE'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
+    # Filtros dinámicos
+    if categorias:
+        consulta += " AND Categoria IN ('" + "','".join(categorias) + "')"
+    if estados:
+        consulta += " AND Estado IN ('" + "','".join(estados) + "')"
+    if gravedades:
+        consulta += " AND Gravedad IN ('" + "','".join(gravedades) + "')"
 
-#--------------------- SOLO ABIERTO ---------------------#
-def filtroAbierto(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Estado = 'ABIERTO'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- SOLO CERRADO ---------------------#
-def filtroCerrado(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Estado = 'CERRADO'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- SOFTWARE + HARDWARE ---------------------#
-def filtroSoftwareHardware(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND (Categoria = 'SOFTWARE' OR Categoria = 'HARDWARE')"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- SOFTWARE + ABIERTO ---------------------#
-def filtroSoftwareAbierto(correoIniciado):
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'SOFTWARE' AND Estado = 'ABIERTO'"
-    )
     cursor.execute(consulta)
     resultados = cursor.fetchall()
     conexion.close()
-    return resultados
 
-#--------------------- SOFTWARE + CERRADO ---------------------#
-def filtroSoftwareCerrado(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'SOFTWARE' AND Estado = 'CERRADO'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- HARDWARE + ABIERTO ---------------------#
-def filtroHardwareAbierto(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'HARDWARE' AND Estado = 'ABIERTO'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- HARDWARE + CERRADO ---------------------#
-def filtroHardwareCerrado(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'HARDWARE' AND Estado = 'CERRADO'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- ABIERTO + CERRADO ---------------------#
-def filtroAbiertoCerrado(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND (Estado = 'ABIERTO' OR Estado = 'CERRADO')"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- SOFTWARE + HARDWARE + ABIERTO ---------------------#
-def filtroSoftwareHardwareAbierto(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND (Categoria = 'SOFTWARE' OR Categoria = 'HARDWARE') AND Estado = 'ABIERTO'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- SOFTWARE + HARDWARE + CERRADO ---------------------#
-def filtroSoftwareHardwareCerrado(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND (Categoria = 'SOFTWARE' OR Categoria = 'HARDWARE') AND Estado = 'CERRADO'"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- SOFTWARE + ABIERTO + CERRADO ---------------------#
-def filtroSoftwareAbiertoCerrado(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'SOFTWARE' AND (Estado = 'ABIERTO' OR Estado = 'CERRADO')"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-
-#--------------------- HARDWARE + ABIERTO + CERRADO ---------------------#
-def filtroHardwareAbiertoCerrado(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db")
-    cursor = conexion.cursor()
-    consulta = (
-        "SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria "
-        "FROM Incidencias "
-        "WHERE Correo = '" + correoIniciado + "' AND Categoria = 'HARDWARE' AND (Estado = 'ABIERTO' OR Estado = 'CERRADO')"
-    )
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
     return resultados
 
 

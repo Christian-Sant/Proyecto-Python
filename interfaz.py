@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QAction,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
 from PyQt5.QtCore import QDate #type: ignore
-from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias, filtroSoftware, filtroHardware, filtroAbierto, filtroCerrado,filtroAbiertoCerrado,filtroHardwareAbierto,filtroHardwareAbiertoCerrado,filtroHardwareCerrado,filtroSoftwareAbierto,filtroSoftwareAbiertoCerrado,filtroSoftwareCerrado,filtroSoftwareHardware,filtroSoftwareHardwareAbierto,filtroSoftwareHardwareCerrado, actualizarIncidencia
+from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias,actualizarIncidencia, obtener_incidencias
 from utilidades import idAzarIncidencia
+
+
 class interfazUsuario(QWidget) :
 
     #---------------------INICIO---------------------#
@@ -703,7 +705,8 @@ class interfazUsuario(QWidget) :
         self.tabla.setColumnCount(7)
         self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion", "Gravedad", "Fecha","Estado","Categoria"])
         self.tabla.show()
-        self.filtrototal()
+        resultado = vistasIncidencias(self.correoIniciado)
+        self.cargar_tabla(resultado)
         #-----------------------------FIN------------------------------# 
 
        
@@ -717,139 +720,110 @@ class interfazUsuario(QWidget) :
         self.filtro.setPopupMode(QToolButton.InstantPopup)
         #-----------------------------FIN------------------------------# 
 
-
-        #-----------------------------Creacion del menu con checkbox------------------------------# 
+# ------------------- Crear menú de filtros ------------------- #
         self.menu = QMenu(self)
 
-        # --- Sección de categorías ---
-        self.selec1 = QCheckBox("SOFTWARE")
-        self.selec1.stateChanged.connect(self.softwareCambiado)
+        # --- Categorías ---
+        self.checkboxSoftware = QCheckBox("SOFTWARE")
+        self.checkboxSoftware.stateChanged.connect(self.filtrototal)
         action1 = QWidgetAction(self.menu)
-        action1.setDefaultWidget(self.selec1)
+        action1.setDefaultWidget(self.checkboxSoftware)
         self.menu.addAction(action1)
 
-        self.selec2 = QCheckBox("HARDWARE")
-        self.selec2.stateChanged.connect(self.hardwareCambiado)
+        self.checkboxHardware = QCheckBox("HARDWARE")
+        self.checkboxHardware.stateChanged.connect(self.filtrototal)
         action2 = QWidgetAction(self.menu)
-        action2.setDefaultWidget(self.selec2)
+        action2.setDefaultWidget(self.checkboxHardware)
         self.menu.addAction(action2)
 
         self.menu.addSeparator()
 
-        # --- Sección de estados ---
-        self.selec3 = QCheckBox("ABIERTO")
-        self.selec3.stateChanged.connect(self.abiertoCambiado)
+        # --- Estados ---
+        self.checkboxAbierto = QCheckBox("ABIERTO")
+        self.checkboxAbierto.stateChanged.connect(self.filtrototal)
         action3 = QWidgetAction(self.menu)
-        action3.setDefaultWidget(self.selec3)
+        action3.setDefaultWidget(self.checkboxAbierto)
         self.menu.addAction(action3)
 
-        self.selec4 = QCheckBox("CERRADO")
-        self.selec4.stateChanged.connect(self.cerradoCambiado)
+        self.checkboxCerrado = QCheckBox("CERRADO")
+        self.checkboxCerrado.stateChanged.connect(self.filtrototal)
         action4 = QWidgetAction(self.menu)
-        action4.setDefaultWidget(self.selec4)
+        action4.setDefaultWidget(self.checkboxCerrado)
         self.menu.addAction(action4)
 
+        self.menu.addSeparator()
+
+        # --- Gravedad ---
+        self.checkboxBaja = QCheckBox("Baja")
+        self.checkboxBaja.stateChanged.connect(self.filtrototal)
+        action5 = QWidgetAction(self.menu)
+        action5.setDefaultWidget(self.checkboxBaja)
+        self.menu.addAction(action5)
+
+        self.checkboxMedia = QCheckBox("Media")
+        self.checkboxMedia.stateChanged.connect(self.filtrototal)
+        action6 = QWidgetAction(self.menu)
+        action6.setDefaultWidget(self.checkboxMedia)
+        self.menu.addAction(action6)
+
+        self.checkboxAlta = QCheckBox("Alta")
+        self.checkboxAlta.stateChanged.connect(self.filtrototal)
+        action7 = QWidgetAction(self.menu)
+        action7.setDefaultWidget(self.checkboxAlta)
+        self.menu.addAction(action7)
+
+        self.checkboxGrave = QCheckBox("Grave")
+        self.checkboxGrave.stateChanged.connect(self.filtrototal)
+        action8 = QWidgetAction(self.menu)
+        action8.setDefaultWidget(self.checkboxGrave)
+        self.menu.addAction(action8)
+
+        self.checkboxMuyGrave = QCheckBox("Muy Grave")
+        self.checkboxMuyGrave.stateChanged.connect(self.filtrototal)
+        action9 = QWidgetAction(self.menu)
+        action9.setDefaultWidget(self.checkboxMuyGrave)
+        self.menu.addAction(action9)
+
+        # Asignar el menú al botón
         self.filtro.setMenu(self.menu)
         self.filtro.show()
 
-
-        
-     
-
-        #-----------------------------FIN------------------------------#
-    #-----------------------------FIN------------------------------#
-    calculoSoftware = 0
-    calculoHardware = 0
-    calculoAbierto = 0
-    calculoCerrado = 0
-
+    # ------------------- Método para actualizar la tabla según filtros ------------------- #
     def filtrototal(self):
-        self.total = self.calculoSoftware + self.calculoHardware + self.calculoAbierto + self.calculoCerrado
-        correo = self.correoIniciado  # Ajusta según cómo guardes el correo activo
+        # Categorías
+        categorias = []
+        if self.checkboxSoftware.isChecked():
+            categorias.append("SOFTWARE")
+        if self.checkboxHardware.isChecked():
+            categorias.append("HARDWARE")
 
-        if self.total == 0:
-            self.resultado = vistasIncidencias(correo)
+        # Estados
+        estados = []
+        if self.checkboxAbierto.isChecked():
+            estados.append("ABIERTO")
+        if self.checkboxCerrado.isChecked():
+            estados.append("CERRADO")
 
-        elif self.total == 1:
-            self.resultado = filtroSoftware(correo)
+        # Gravedad
+        gravedades = []
+        if self.checkboxBaja.isChecked():
+            gravedades.append("Baja")
+        if self.checkboxMedia.isChecked():
+            gravedades.append("Media")
+        if self.checkboxAlta.isChecked():
+            gravedades.append("Alta")
+        if self.checkboxGrave.isChecked():
+            gravedades.append("Grave")
+        if self.checkboxMuyGrave.isChecked():
+            gravedades.append("Muy Grave")
 
-        elif self.total == 2:
-            self.resultado = filtroHardware(correo)
+        # Llamada a la base de datos
+        resultados = obtener_incidencias(self.correoIniciado, categorias, estados, gravedades)
 
-        elif self.total == 4:
-            self.resultado = filtroAbierto(correo)
-
-        elif self.total == 8:
-            self.resultado = filtroCerrado(correo)
-
-        elif self.total == 3:
-            self.resultado = filtroSoftwareHardware(correo)
-
-        elif self.total == 5:
-            self.resultado = filtroSoftwareAbierto(correo)
-
-        elif self.total == 9:
-            self.resultado = filtroSoftwareCerrado(correo)
-
-        elif self.total == 6:
-            self.resultado = filtroHardwareAbierto(correo)
-
-        elif self.total == 10:
-            self.resultado = filtroHardwareCerrado(correo)
-
-        elif self.total == 12:
-            self.resultado = filtroAbiertoCerrado(correo)
-
-        elif self.total == 7:
-            self.resultado = filtroSoftwareHardwareAbierto(correo)
-
-        elif self.total == 11:
-            self.resultado = filtroSoftwareHardwareCerrado(correo)
-
-        elif self.total == 13:
-            self.resultado = filtroSoftwareAbiertoCerrado(correo)
-
-        elif self.total == 14:
-            self.resultado = filtroHardwareAbiertoCerrado(correo)
-
-        elif self.total == 15:
-            self.resultado = vistasIncidencias(correo)
-
-        else:
-            self.resultado = vistasIncidencias(correo)
-
-        # Aquí puedes actualizar tu tabla o lista con los resultados
-        self.cargar_tabla(self.resultado)
+        # Actualizar tabla
+        self.cargar_tabla(resultados)
 
 
-
-    def softwareCambiado(self, estado):
-        if estado == 2:
-            self.calculoSoftware = 1
-        else:
-            self.calculoSoftware = 0
-        self.filtrototal()
-
-    def hardwareCambiado(self, estado):
-        if estado == 2:
-            self.calculoHardware = 2
-        else:
-            self.calculoHardware = 0
-        self.filtrototal()
-
-    def abiertoCambiado(self, estado):
-        if estado == 2:
-            self.calculoAbierto = 4
-        else:
-            self.calculoAbierto = 0
-        self.filtrototal()
-
-    def cerradoCambiado(self, estado):
-        if estado == 2:
-            self.calculoCerrado = 8
-        else:
-            self.calculoCerrado = 0
-        self.filtrototal()
 
             
 
@@ -939,8 +913,10 @@ class interfazUsuario(QWidget) :
         self.escribirDescripcionEdit.move(110,80)
         self.escribirDescripcionEdit.resize(220, 80)
         self.escribirDescripcionEdit.setFont(QFont("Arial", 12))
-        self.escribirDescripcionEdit.show()
         self.escribirDescripcionEdit.setPlainText(descripcion)
+        self.escribirDescripcionEdit.textChanged.connect(self.actualizarPrediccionEdit)
+        self.escribirDescripcionEdit.show()
+       
 
         #-----------------------------FIN------------------------------#
 
@@ -1080,6 +1056,27 @@ class interfazUsuario(QWidget) :
             index_grav = self.seleccionarGravedad.findText(gravedad)
             if index_grav != -1:
                 self.seleccionarGravedad.setCurrentIndex(index_grav)
+    def actualizarPrediccionEdit(self):
+        from ia import predecir
+        # Obtener texto actual de la descripción
+        descripcion = self.escribirDescripcionEdit.toPlainText().strip()
+        if descripcion == "":
+            return  # Si está vacío, no hace nada
+
+        # Llamar a la función de predicción de tu IA
+        categoria, gravedad = predecir(descripcion)  # Usa tu función del módulo IA
+
+        if categoria:
+            # Establecer el valor en el QComboBox
+            index_cat = self.seleccionarCategoriaEdit.findText(categoria)
+            if index_cat != -1:
+                self.seleccionarCategoriaEdit.setCurrentIndex(index_cat)
+
+        if gravedad:
+            # Establecer el valor en el QComboBox
+            index_grav = self.seleccionarGravedadEdit.findText(gravedad)
+            if index_grav != -1:
+                self.seleccionarGravedadEdit.setCurrentIndex(index_grav)
 
 
 
