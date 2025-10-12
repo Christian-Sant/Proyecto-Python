@@ -1,10 +1,13 @@
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QAction,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
+import csv
+from PyQt5.QtWidgets import QApplication, QFileDialog, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QAction,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
 from PyQt5.QtCore import QDate #type: ignore
-from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias,actualizarIncidencia, obtener_incidencias
+from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias,actualizarIncidencia, obtener_incidencias,eliminarIncidencia,abrirIncidencia,cerrarIncidencia
 from utilidades import idAzarIncidencia
-
-
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle #type: ignore
+from reportlab.lib import colors #type: ignore
+from reportlab.lib.pagesizes import letter, landscape #type: ignore
+from grafico import generar_graficas
 class interfazUsuario(QWidget) :
 
     #---------------------INICIO---------------------#
@@ -253,6 +256,11 @@ class interfazUsuario(QWidget) :
         self.tabla.hide()
         self.filtro.hide()
         self.txtTituloIncidencias.hide()
+        self.botonCerrar.hide()
+        self.botonAbrir.hide()
+        self.botonEliminar.hide()
+        self.botonDescargarCSV.hide()
+        self.botonDescargarPDF.hide()
         self.txtIniciarSesion.show()
         self.CorreoIS.show()
         self.password.show()
@@ -401,6 +409,11 @@ class interfazUsuario(QWidget) :
         self.move(800,400)
         self.txtTituloIncidencias.hide()
         self.tabla.hide()
+        self.botonCerrar.hide()
+        self.botonAbrir.hide()
+        self.botonEliminar.hide()
+        self.botonDescargarCSV.hide()
+        self.botonDescargarPDF.hide()
         self.filtro.hide()
         self.editarIncidencias.hide()
         self.grafico.hide()
@@ -589,6 +602,11 @@ class interfazUsuario(QWidget) :
         self.txtCategoria.hide()
         self.seleccionarCategoria.hide()
         self.confirmarIncidencia.hide()
+        self.botonDescargarCSV.show()
+        self.botonDescargarPDF.show()
+        self.botonCerrar.show()
+        self.botonAbrir.show()
+        self.botonEliminar.show()
         self.editarIncidencias.show()
         self.grafico.show()
         self.txtTituloIncidencias.show()
@@ -621,7 +639,12 @@ class interfazUsuario(QWidget) :
         self.confirmarIncidenciaEdit.hide()
         self.cancelarIncidenciaEdit.hide()
         self.editarIncidencias.show()
+        self.botonDescargarCSV.show()
+        self.botonDescargarPDF.show()
         self.grafico.show()
+        self.botonCerrar.show()
+        self.botonAbrir.show()
+        self.botonEliminar.show()
         self.crearIncidencias.show()
         self.txtTituloIncidencias.show()
         self.cerrarSesion.show()
@@ -669,6 +692,33 @@ class interfazUsuario(QWidget) :
         self.txtTituloIncidencias.show()
         #-----------------------------FIN------------------------------#
 
+        #-----------------------------El boton para eliminar una fila en el apartado Vista------------------------------# 
+        self.botonEliminar = QPushButton("Eliminar", self)
+        self.botonEliminar.resize(140, 30)
+        self.botonEliminar.setFont(QFont("Arial", 12))
+        self.botonEliminar.move(202, 58)
+        self.botonEliminar.show()
+        self.botonEliminar.clicked.connect(self.eliminar_incidencia)
+        #-----------------------------FIN------------------------------# 
+
+        #-----------------------------El boton para Abrir una incidencia en el apartado Vista------------------------------# 
+        self.botonAbrir = QPushButton("Abrir", self)
+        self.botonAbrir.resize(140, 30)
+        self.botonAbrir.setFont(QFont("Arial", 12))
+        self.botonAbrir.move(394, 58)
+        self.botonAbrir.show()
+        self.botonAbrir.clicked.connect(self.abrir_incidencia)
+        #-----------------------------FIN------------------------------#
+
+        #-----------------------------El boton para Cerrar una incidencia en el apartado Vista------------------------------# 
+        self.botonCerrar = QPushButton("Cerrar", self)
+        self.botonCerrar.resize(140, 30)
+        self.botonCerrar.setFont(QFont("Arial", 12))
+        self.botonCerrar.move(587, 58)
+        self.botonCerrar.show()
+        self.botonCerrar.clicked.connect(self.cerrar_incidencia)
+        #-----------------------------FIN------------------------------#
+
 
         #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
         self.grafico = QPushButton("Grafico", self)
@@ -676,7 +726,7 @@ class interfazUsuario(QWidget) :
         self.grafico.setFont(QFont("Arial", 12))
         self.grafico.move(394, 500)
         self.grafico.show()
-        self.grafico.clicked.connect(self.incidencias)
+        self.grafico.clicked.connect(self.mostrar_estadisticas)
         #-----------------------------FIN------------------------------# 
 
         #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
@@ -691,7 +741,7 @@ class interfazUsuario(QWidget) :
 
         #-----------------------------El boton para acceder al apartado de Creacion de Incidencia------------------------------# 
         self.cerrarSesion = QPushButton("Cerrar Sesion", self)
-        self.cerrarSesion.resize(130, 30)
+        self.cerrarSesion.resize(140, 30)
         self.cerrarSesion.setFont(QFont("Arial", 12))
         self.cerrarSesion.move(10, 500)
         self.cerrarSesion.show()
@@ -709,14 +759,28 @@ class interfazUsuario(QWidget) :
         self.cargar_tabla(resultado)
         #-----------------------------FIN------------------------------# 
 
-       
+        self.botonDescargarPDF = QPushButton("PDF", self)
+        self.botonDescargarPDF.clicked.connect(self.descargar_pdf)
+        self.botonDescargarPDF.move(675,5)
+        self.botonDescargarPDF.setFont(QFont("Arial", 12))
+        self.botonDescargarPDF.resize(50, 20)
+        self.botonDescargarPDF.show()
+
+        self.botonDescargarCSV = QPushButton("CSV", self)
+        self.botonDescargarCSV.clicked.connect(self.descargar_csv)
+        self.botonDescargarCSV.move(625,5)
+        self.botonDescargarCSV.setFont(QFont("Arial", 12))
+        self.botonDescargarCSV.resize(50, 20)
+        self.botonDescargarCSV.show()
+
+
 
         #-----------------------------Creacion del boton para poder seleccionar el filtrado------------------------------# 
         self.filtro = QToolButton(self)
         self.filtro.setText("FILTRAR")
         self.filtro.setFont(QFont("Arial", 12))
-        self.filtro.setGeometry(10, 10, 100, 25)
-        self.filtro.move(10,62)
+        self.filtro.setGeometry(10, 10, 130, 30)
+        self.filtro.move(10,58)
         self.filtro.setPopupMode(QToolButton.InstantPopup)
         #-----------------------------FIN------------------------------# 
 
@@ -755,7 +819,6 @@ class interfazUsuario(QWidget) :
 
         # --- Gravedad ---
         self.checkboxBaja = QCheckBox("Baja")
-        self.checkboxBaja.stateChanged.connect(self.filtrototal)
         action5 = QWidgetAction(self.menu)
         action5.setDefaultWidget(self.checkboxBaja)
         self.menu.addAction(action5)
@@ -818,6 +881,7 @@ class interfazUsuario(QWidget) :
         self.filtro.show()
 
     # ------------------- Método para actualizar la tabla según filtros ------------------- #
+    
     def filtrototal(self):
         # Categorías
         categorias = []
@@ -855,9 +919,87 @@ class interfazUsuario(QWidget) :
         # Actualizar tabla
         self.cargar_tabla(resultados)
 
+    def descargar_csv(self):
+        """
+        Exporta el contenido de la tabla actual a un archivo CSV.
+        """
+        # Abrir diálogo para elegir nombre y ubicación
+        ruta_csv, _ = QFileDialog.getSaveFileName(self, "Guardar CSV", "", "Archivos CSV (*.csv)")
+        if not ruta_csv:
+            return  # Cancelado
+
+        filas = self.tabla.rowCount()
+        columnas = self.tabla.columnCount()
+
+        # Abrir archivo CSV
+        with open(ruta_csv, mode='w', newline='', encoding='utf-8') as archivo:
+            writer = csv.writer(archivo)
+
+            # Encabezados
+            encabezados = [self.tabla.horizontalHeaderItem(col).text() if self.tabla.horizontalHeaderItem(col) else f"Col {col+1}" for col in range(columnas)]
+            writer.writerow(encabezados)
+
+            # Filas
+            for fila in range(filas):
+                fila_datos = []
+                for col in range(columnas):
+                    item = self.tabla.item(fila, col)
+                    fila_datos.append(item.text() if item else "")
+                writer.writerow(fila_datos)
+
+        QMessageBox.information(self, "Éxito", "El CSV se ha generado correctamente.")
 
 
-            
+    def descargar_pdf(self):
+        """
+        Exporta el contenido de la tabla actual a un archivo PDF.
+        """
+        # Abrir diálogo para elegir nombre y ubicación
+        ruta_pdf, _ = QFileDialog.getSaveFileName(self, "Guardar PDF", "", "Archivos PDF (*.pdf)")
+        if not ruta_pdf:
+            return  # Cancelado
+
+        # Extraer datos de la tabla
+        filas = self.tabla.rowCount()
+        columnas = self.tabla.columnCount()
+        datos = []
+
+        # Encabezados
+        encabezados = [self.tabla.horizontalHeaderItem(col).text() if self.tabla.horizontalHeaderItem(col) else f"Col {col+1}" for col in range(columnas)]
+        datos.append(encabezados)
+
+        # Filas
+        for fila in range(filas):
+            fila_datos = []
+            for col in range(columnas):
+                item = self.tabla.item(fila, col)
+                fila_datos.append(item.text() if item else "")
+            datos.append(fila_datos)
+
+        # Crear PDF
+        pdf = SimpleDocTemplate(ruta_pdf, pagesize=landscape(letter))
+        tabla_pdf = Table(datos)
+
+        # Estilo de la tabla con padding
+        estilo = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            # Padding extra
+            ('LEFTPADDING', (0, 0), (-1, -1), 5),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+        ])
+        tabla_pdf.setStyle(estilo)
+
+        # Generar documento
+        pdf.build([tabla_pdf])
+
+        QMessageBox.information(self, "Éxito", "El PDF se ha generado correctamente.")
+
 
     # ------------------------- Cargar tabla ------------------------- #
     def cargar_tabla(self, datos):
@@ -894,6 +1036,9 @@ class interfazUsuario(QWidget) :
         self.txtTituloIncidencias.hide()
         self.registrarse.hide()
         self.tabla.hide()
+        self.botonCerrar.hide()
+        self.botonAbrir.hide()
+        self.botonEliminar.hide()
         self.filtro.hide()
         self.editarIncidencias.hide()
         self.grafico.hide()
@@ -1110,8 +1255,56 @@ class interfazUsuario(QWidget) :
             if index_grav != -1:
                 self.seleccionarGravedadEdit.setCurrentIndex(index_grav)
 
+    def eliminar_incidencia(self):
+        fila = self.tabla.currentRow()
+        if fila == -1:
+            QMessageBox.warning(self, "Atención", "Selecciona una fila")
+            return
+        
+        self.id_incidencia = self.tabla.item(fila, 0).text() 
 
+        if self.id_incidencia:
+            respuesta = QMessageBox.question(
+                self,
+                "Confirmar eliminación",
+                f"¿Estás seguro de eliminar la incidencia con ID {self.id_incidencia}?",
+                QMessageBox.Yes | QMessageBox.No
+            )
+            if respuesta == QMessageBox.Yes:
+                eliminarIncidencia(self.id_incidencia)  
+                self.filtrototal()  # Refresca la tabla
+#-----------------------------FIN------------------------------#
 
+# ------------------ Método para el botón abrirIncidencia ------------------ #
+    def abrir_incidencia(self):
+        fila = self.tabla.currentRow()
+        if fila == -1:
+            QMessageBox.warning(self, "Atención", "Selecciona una fila")
+            return
+        
+        self.id_incidencia = self.tabla.item(fila, 0).text()  
+
+        if self.id_incidencia:
+            abrirIncidencia(self.id_incidencia)  
+            self.filtrototal()  # Refresca tabla
+#-----------------------------FIN------------------------------#
+
+# ------------------ Método para el botón cerrarIncidencia ------------------ #
+    def cerrar_incidencia(self):
+        fila = self.tabla.currentRow()
+        if fila == -1:
+            QMessageBox.warning(self, "Atención", "Selecciona una fila")
+            return
+        
+        self.id_incidencia = self.tabla.item(fila, 0).text()  
+
+        if self.id_incidencia:
+            cerrarIncidencia(self.id_incidencia)  
+            self.filtrototal()  # Refresca tabla
+#-----------------------------FIN------------------------------#
+
+    def mostrar_estadisticas(self):
+        generar_graficas(self.correoIniciado)
 
 
 
