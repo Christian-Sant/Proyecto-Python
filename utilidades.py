@@ -1,7 +1,8 @@
 import random
 import string
+from baseDeDatos import vistaIdIncidencia
+#-----------------------------Metodo para crear un IDs para Incidencia------------------------------#
 def idAzarIncidencia(): 
-    from baseDeDatos import vistaIdIncidencia
     ids = vistaIdIncidencia()
     idsIncidencia = []
     for i in ids:
@@ -20,3 +21,4 @@ def idAzarIncidencia():
             continue  # Repetir el bucle para generar uno nuevo
         else:
             return idIncidencia
+#-----------------------------FIN------------------------------#

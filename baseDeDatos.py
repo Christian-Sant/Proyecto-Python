@@ -1,7 +1,6 @@
 import sqlite3
 from datetime import datetime
-
-#---------------------Metodo de la base de datos---------------------# 
+#---------------------Metodo para la creacion de la base de datos---------------------# 
 def baseDeDatos():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     conexion.execute("PRAGMA foreign_keys = ON;") 
@@ -34,8 +33,9 @@ def baseDeDatos():
     """)
     conexion.commit()
     conexion.close()
-
     #-----------------------------FIN------------------------------#
+#-----------------------------FIN------------------------------#
+
 
 
 #---------------------Metodo para ver el correo de la tabla usuarios---------------------# 
@@ -51,20 +51,7 @@ def vistaCorreo():
 
 
 
-#---------------------Metodo para ver el correo de la tabla usuarios---------------------# 
-def vistasIncidencias(correoIniciado):
-    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
-    cursor = conexion.cursor()
-    consulta = ("Select ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria from Incidencias WHERE Correo = '" + correoIniciado + "'")
-    cursor.execute(consulta)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
-#-----------------------------FIN------------------------------#
-
-
-
-#---------------------Metodo para ver el correo de la tabla usuarios---------------------# 
+#---------------------Metodo para ver los IDs de las Incidencias---------------------# 
 def vistaIdIncidencia():
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
@@ -75,18 +62,33 @@ def vistaIdIncidencia():
     return resultados
 #-----------------------------FIN------------------------------#
 
-# ------------------- Método en base de datos ------------------- #
+
+
+#---------------------Metodo para hacer la tabla para la visualizar los datos---------------------# 
+def vistasIncidencias(correoIniciado):
+    conexion = sqlite3.connect("IncidenciasInformaticas.db") 
+    cursor = conexion.cursor()
+    consulta = ("SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria FROM Incidencias WHERE Correo = ?")
+    cursor.execute(consulta, (correoIniciado,))
+    resultados = cursor.fetchall()
+    conexion.close()
+    return resultados
+#-----------------------------FIN------------------------------#
+
+
+
+# -------------------Metodo para filtrar la tabla------------------- #
 def obtener_incidencias(correo, categorias, estados, gravedades, fecha_inicio=None, fecha_fin=None):
     consulta = f"SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria FROM Incidencias WHERE Correo='{correo}'"
 
     if categorias:
-        consulta += " AND Categoria IN ('" + "','".join(categorias) + "')"
+        consulta = consulta + " AND Categoria IN ('" + "','".join(categorias) + "')"
     if estados:
-        consulta += " AND Estado IN ('" + "','".join(estados) + "')"
+        consulta = consulta + " AND Estado IN ('" + "','".join(estados) + "')"
     if gravedades:
-        consulta += " AND Gravedad IN ('" + "','".join(gravedades) + "')"
+        consulta = consulta + " AND Gravedad IN ('" + "','".join(gravedades) + "')"
     if fecha_inicio and fecha_fin:
-        consulta += f" AND Fecha BETWEEN '{fecha_inicio}' AND '{fecha_fin}'"
+        consulta = consulta +  f" AND Fecha BETWEEN '{fecha_inicio}' AND '{fecha_fin}'"
 
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
@@ -94,8 +96,7 @@ def obtener_incidencias(correo, categorias, estados, gravedades, fecha_inicio=No
     resultados = cursor.fetchall()
     conexion.close()
     return resultados
-
-
+#-----------------------------FIN------------------------------#
 
 
 
@@ -111,128 +112,112 @@ def vistaCorreoYPassword():
 #-----------------------------FIN------------------------------#
 
 
+
 #---------------------Añadir nuevos usuarios a la base de datos---------------------# 
 def insertarUsuario(correo, password):
-    consulta = (
-        "INSERT INTO USUARIOS (correo, Contraseña) VALUES ('"
-        + correo + "', '"
-        + password + "')"
-    )
+    consulta = "INSERT INTO USUARIOS (correo, Contraseña) VALUES (?, ?)"
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
-    cursor.execute(consulta)
+    cursor.execute(consulta, (correo, password))
     conexion.commit()
     conexion.close()
 #-----------------------------FIN------------------------------#
+
+
 
 #---------------------Añadir nuevas incidencias a la base de datos---------------------# 
-def insertarIncidencia(correo,iD_Incidencias, titulo, descripcion, gravedad, fecha, categoria):
+def insertarIncidencia(correo, iD_Incidencias, titulo, descripcion, gravedad, fecha, categoria):
     consulta = (
-    "INSERT INTO INCIDENCIAS (Correo, ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Categoria, Estado) VALUES ('"
-    + correo + "', '"
-    + iD_Incidencias + "', '"
-    + titulo + "', '"
-    + descripcion + "', '"
-    + gravedad + "', '"
-    + fecha + "', '"
-    + categoria + "', 'ABIERTO')"
+        "INSERT INTO INCIDENCIAS "
+        "(Correo, ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Categoria, Estado) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, 'ABIERTO')"
     )
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
-    cursor.execute(consulta)
+    cursor.execute(consulta, (correo, iD_Incidencias, titulo, descripcion, gravedad, fecha, categoria))
     conexion.commit()
     conexion.close()
 #-----------------------------FIN------------------------------#
 
+
+
+#---------------------Hacer un update a la incidencia seleccionada---------------------# 
 def actualizarIncidencia(id_incidencia, titulo, descripcion, gravedad, fecha, categoria):
 
     consulta = (
         "UPDATE INCIDENCIAS SET "
-        "Titulo = '" + titulo + "', "
-        "Descripcion = '" + descripcion + "', "
-        "Gravedad = '" + gravedad + "', "
-        "Fecha = '" + fecha + "', "
-        "Categoria = '" + categoria + "' "
-        "WHERE ID_Incidencia = '" + id_incidencia + "'"
+        "Titulo = ?, "
+        "Descripcion = ?, "
+        "Gravedad = ?, "
+        "Fecha = ?, "
+        "Categoria = ? "
+        "WHERE ID_Incidencia = ?"
     )
 
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
-    cursor.execute(consulta)
+    cursor.execute(consulta, (titulo, descripcion, gravedad, fecha, categoria, id_incidencia))
     conexion.commit()
     conexion.close()
+#-----------------------------FIN------------------------------#
 
-#---------------------Borrar incidencias a la base de datos---------------------# 
-#---------------------Borrar incidencias a la base de datos---------------------# 
+
+
+#---------------------Borrar una incidencia en la base de datos---------------------# 
 def eliminarIncidencia(id_incidencias):
-    consulta = (
-    "DELETE FROM INCIDENCIAS WHERE ID_Incidencia LIKE '" 
-    + id_incidencias
-    + "';"
-    )
+    consulta = "DELETE FROM INCIDENCIAS WHERE ID_Incidencia LIKE ?"
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
-    cursor.execute(consulta)
+    cursor.execute(consulta, (id_incidencias,))
     conexion.commit()
     conexion.close()
 #-----------------------------FIN------------------------------#
 
-#---------------------Cambiar a Abierto el estado de una incidencia de la base de datos---------------------#
+
+
+#---------------------Cambiar a Abierto el estado de una incidencia en la base de datos---------------------#
 def abrirIncidencia(id_incidencia):
 
-    consulta = (
-        "UPDATE INCIDENCIAS SET "
-        "Estado = 'ABIERTO'"
-        "WHERE ID_Incidencia = '" + id_incidencia + "'"
-    )
-
+    consulta = "UPDATE INCIDENCIAS SET Estado = 'ABIERTO' WHERE ID_Incidencia = ?"
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
-    cursor.execute(consulta)
+    cursor.execute(consulta, (id_incidencia,))
     conexion.commit()
     conexion.close()
 #-----------------------------FIN------------------------------#
 
-#---------------------Cambiar a Cerrado el estado de una incidencia de la base de datos---------------------#
+
+
+#---------------------Cambiar a Cerrado el estado de una incidencia en la base de datos---------------------#
 def cerrarIncidencia(id_incidencia):
 
-    consulta = (
-        "UPDATE INCIDENCIAS SET "
-        "Estado = 'CERRADO'"
-        "WHERE ID_Incidencia = '" + id_incidencia + "'"
-    )
+    consulta = "UPDATE INCIDENCIAS SET Estado = 'CERRADO' WHERE ID_Incidencia = ?"
 
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
-    cursor.execute(consulta)
+    cursor.execute(consulta, (id_incidencia,))
     conexion.commit()
     conexion.close()
 #-----------------------------FIN------------------------------#
 
-def obtener_estadisticas(correo,nombre_db):
-    """
-    Devuelve estadísticas filtradas por correo:
-    - Incidencias por categoría
-    - Incidencias por estado
-    - Tiempos de resolución (si existe FechaCierre)
-    """
-    import sqlite3
-    from datetime import datetime
+
+
+#---------------------Metodo para poder hacer el grafico---------------------#
+def obtener_grafico(correo,nombre_db):
 
     conexion = sqlite3.connect(nombre_db)
     cursor = conexion.cursor()
 
-    # ----------------- Incidencias por categoría -----------------
-    cursor.execute("SELECT Categoria, COUNT(*) FROM Incidencias WHERE Correo = ? GROUP BY Categoria", (correo,))
+    cursor.execute("SELECT Categoria, COUNT(*) FROM Incidencias WHERE Correo = ? GROUP BY Categoria", (correo,)) #Se agrupa por categoria
     por_categoria = cursor.fetchall()
 
-    # ----------------- Incidencias por estado -----------------
-    cursor.execute("SELECT Estado, COUNT(*) FROM Incidencias WHERE Correo = ? GROUP BY Estado", (correo,))
+
+    cursor.execute("SELECT Estado, COUNT(*) FROM Incidencias WHERE Correo = ? GROUP BY Estado", (correo,)) #Se agrupa por estado
     por_estado = cursor.fetchall()
 
-    # ----------------- Tiempos de resolución -----------------
+
     tiempos_resolucion = []
-    tiene_fecha_cierre = _col_exists(cursor, "Incidencias", "FechaCierre")
+    tiene_fecha_cierre = _col_exists(cursor, "Incidencias", "FechaCierre") #Tiempo de resulucion
 
     if tiene_fecha_cierre:
         cursor.execute("""
@@ -255,10 +240,13 @@ def obtener_estadisticas(correo,nombre_db):
     conexion.close()
 
     return por_categoria, por_estado, tiempos_resolucion
+#-----------------------------FIN------------------------------#
 
 
+
+#---------------------Para saber si una tabla existe---------------------#
 def _col_exists(cursor, tabla, columna):
-    """Comprueba si una columna existe en una tabla."""
     cursor.execute(f"PRAGMA table_info({tabla})")
     columnas = [col[1] for col in cursor.fetchall()]
     return columna in columnas
+#-----------------------------FIN------------------------------#

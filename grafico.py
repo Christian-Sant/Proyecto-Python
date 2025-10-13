@@ -1,22 +1,16 @@
 import matplotlib.pyplot as plt #type: ignore
-from baseDeDatos import obtener_estadisticas  # importará las consultas que veremos después
+from baseDeDatos import obtener_grafico 
+#-----------------------------Creacion del grafico------------------------------#
 def generar_graficas(correo,nombre_db="IncidenciasInformaticas.db"):
-    """
-    Genera y muestra tres gráficas de barras:
-      1) Incidencias por categoría
-      2) Incidencias por estado
-      3) Tiempo de resolución (promedio o distribución) en días
-    """
     
-    # obtener datos desde la capa de BD
-    por_categoria, por_estado, tiempos_resolucion = obtener_estadisticas(correo,nombre_db)
+    por_categoria, por_estado, tiempos_resolucion = obtener_grafico(correo,nombre_db) #Obtener los datos de la base de datos
 
-    # ---------- Gráfica 1: Incidencias por categoría ----------
+    
     plt.figure(figsize=(16, 5))
 
-    # 🔹 Título de la ventana
-    plt.gcf().canvas.manager.set_window_title("Grafico de las Incidencias")
+    plt.gcf().canvas.manager.set_window_title("Grafico de las Incidencias")# Titulo de la ventana
 
+    #-----------------------------Grafico de Categoria------------------------------#
     plt.subplot(1, 3, 1)
     if por_categoria:
         categorias, counts_cat = zip(*por_categoria)
@@ -31,7 +25,7 @@ def generar_graficas(correo,nombre_db="IncidenciasInformaticas.db"):
     plt.xlabel("Categoría")
     plt.ylabel("Cantidad")
 
-    # ---------- Gráfica 2: Incidencias por estado ----------
+    #-----------------------------Grafico de Estado------------------------------#
     plt.subplot(1, 3, 2)
     if por_estado:
         estados, counts_est = zip(*por_estado)
@@ -45,10 +39,9 @@ def generar_graficas(correo,nombre_db="IncidenciasInformaticas.db"):
     plt.title("Incidencias por Estado")
     plt.xlabel("Estado")
 
-    # ---------- Gráfica 3: Tiempo de resolución ----------
+    #-----------------------------Grafico de Tiempo de resolucion------------------------------#
     plt.subplot(1, 3, 3)
     if tiempos_resolucion:
-        # mostramos histograma (barras) de tiempos en días
         plt.hist(tiempos_resolucion, bins=10, edgecolor='black')
         plt.title("Tiempo de resolución (días) — distribución")
         plt.xlabel("Días")
@@ -57,5 +50,5 @@ def generar_graficas(correo,nombre_db="IncidenciasInformaticas.db"):
         plt.text(0.5, 0.5, 'No hay incidencias cerradas con fecha de cierre', ha='center')
 
     plt.tight_layout()
-    plt.show()
-    
+    plt.show(block=False)
+#-----------------------------FIN------------------------------#

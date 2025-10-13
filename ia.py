@@ -4,12 +4,8 @@ from sklearn.naive_bayes import MultinomialNB #type: ignore
 from sklearn.pipeline import make_pipeline #type: ignore
 
 
-# ==================== ENTRENAR DESDE DATOS MANUALES ==================== #
+#-----------------------------Entrenar IA con datos------------------------------#
 def entrenar_modelo():
-    """
-    Entrena el modelo de categoría y gravedad con ejemplos definidos manualmente.
-    Puedes agregar más ejemplos para mejorar la precisión.
-    """
     datos = [
         ("El monitor no enciende y la luz de encendido parpadea constantemente.", "HARDWARE", "Grave"),
         ("El teclado tiene varias teclas que no funcionan correctamente.", "HARDWARE", "Media"),
@@ -828,61 +824,19 @@ def entrenar_modelo():
     # Guardar modelos entrenados
     pickle.dump(modelo_categoria, open("modelo_categoria.pkl", "wb"))
     pickle.dump(modelo_gravedad, open("modelo_gravedad.pkl", "wb"))
+#-----------------------------FIN------------------------------#
 
-    print("✅ Modelos entrenados y guardados correctamente.")
-
-
-# ==================== ENTRENAR DESDE BASE DE DATOS ==================== #
-def entrenar_modelo_desde_db(nombre_db="IncidenciasInformaticas.db"):
-    """
-    Entrena los modelos a partir de los datos almacenados en la base de datos.
-    Se debe tener la tabla 'Incidencias' con las columnas:
-    Descripcion, Categoria, Gravedad
-    """
-    import sqlite3
-
-    conexion = sqlite3.connect(nombre_db)
-    cursor = conexion.cursor()
-
-    cursor.execute("SELECT Descripcion, Categoria, Gravedad FROM Incidencias")
-    datos = cursor.fetchall()
-    conexion.close()
-
-    if not datos:
-        print("⚠️ No hay datos en la base de datos para entrenar.")
-        return
-
-    descripciones = [d[0] for d in datos]
-    categorias = [d[1] for d in datos]
-    gravedades = [d[2] for d in datos]
-
-    modelo_categoria = make_pipeline(TfidfVectorizer(), MultinomialNB())
-    modelo_gravedad = make_pipeline(TfidfVectorizer(), MultinomialNB())
-
-    modelo_categoria.fit(descripciones, categorias)
-    modelo_gravedad.fit(descripciones, gravedades)
-
-    pickle.dump(modelo_categoria, open("modelo_categoria.pkl", "wb"))
-    pickle.dump(modelo_gravedad, open("modelo_gravedad.pkl", "wb"))
-
-    print("✅ Modelos entrenados desde la base de datos y guardados.")
-
-
-# ==================== PREDICCIÓN ==================== #
+#-----------------------------Predicir la categoria y gravedad a traves de la descripcion------------------------------#
 def predecir(descripcion):
-    """
-    Usa los modelos entrenados para predecir la categoría y gravedad
-    de una descripción nueva.
-    """
     try:
         modelo_categoria = pickle.load(open("modelo_categoria.pkl", "rb"))
         modelo_gravedad = pickle.load(open("modelo_gravedad.pkl", "rb"))
     except FileNotFoundError:
-        print("❌ No se encontraron los modelos. Ejecuta primero entrenar_modelo() o entrenar_modelo_desde_db().")
         return None, None
 
     categoria = modelo_categoria.predict([descripcion])[0]
     gravedad = modelo_gravedad.predict([descripcion])[0]
 
     return categoria, gravedad
+#-----------------------------FIN------------------------------#
 
