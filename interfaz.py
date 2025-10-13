@@ -1,10 +1,11 @@
 import csv
-from PyQt5.QtWidgets import QFileDialog, QLineEdit, QMessageBox, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QLineEdit, QMessageBox, QVBoxLayout, QWidget, QLabel, QPushButton, QTextEdit, QComboBox, QDateEdit,QTableWidget,QToolButton,QMenu,QCheckBox,QWidgetAction,QTableWidgetItem # type: ignore
 from PyQt5.QtGui import QFont #type: ignore
-from PyQt5.QtCore import QDate #type: ignore
+from PyQt5.QtCore import QDate
+from reportlab.lib.styles import getSampleStyleSheet #type: ignore
 from baseDeDatos import insertarUsuario, insertarIncidencia, vistasIncidencias,actualizarIncidencia, obtener_incidencias,eliminarIncidencia,abrirIncidencia,cerrarIncidencia,vistaCorreoYPassword,vistaCorreo
 from utilidades import idAzarIncidencia
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle #type: ignore
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle #type: ignore
 from reportlab.lib import colors #type: ignore
 from reportlab.lib.pagesizes import letter, landscape #type: ignore
 from ia import predecir
@@ -706,7 +707,7 @@ class interfazUsuario(QWidget) :
 
         #---------------------Label Categoria en el Apartado Incidencias---------------------#
         self.txtTituloIncidencias = QLabel("INCIDENCIAS", self)
-        self.txtTituloIncidencias.move(295, 10)
+        self.txtTituloIncidencias.move(305, 10)
         font = QFont("Arial", 16, QFont.Bold)
         font.setUnderline(True)
         self.txtTituloIncidencias.setFont(font) 
@@ -773,8 +774,8 @@ class interfazUsuario(QWidget) :
         #-----------------------------Creacion de la tabla para poder visualizar los datos de las incidencias------------------------------# 
         self.tabla = QTableWidget(self)
         self.tabla.setGeometry(10, 90, 717, 400)
-        self.tabla.setColumnCount(7)
-        self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion", "Gravedad", "Fecha","Estado","Categoria"])
+        self.tabla.setColumnCount(8)
+        self.tabla.setHorizontalHeaderLabels(["ID", "Titulo", "Descripcion", "Gravedad", "Fecha Creada","Fecha Cierre","Estado","Categoria"])
         self.tabla.show()
         resultado = vistasIncidencias(self.correoIniciado)
         self.cargar_tabla(resultado)
@@ -1000,33 +1001,39 @@ class interfazUsuario(QWidget) :
 
     #-----------------------------Metodo para descargar la tabla en PDF------------------------------#
     def descargar_pdf(self):
-        
-        ruta_pdf, _ = QFileDialog.getSaveFileName(self, "Guardar PDF", "", "Archivos PDF (*.pdf)") # Poner el nombre del documento
+        ruta_pdf, _ = QFileDialog.getSaveFileName(self, "Guardar PDF", "", "Archivos PDF (*.pdf)")
         if not ruta_pdf:
-            return 
+            return
 
-        # Extraer datos de la tabla
         filas = self.tabla.rowCount()
         columnas = self.tabla.columnCount()
         datos = []
 
-        
-        encabezados = [self.tabla.horizontalHeaderItem(col).text() if self.tabla.horizontalHeaderItem(col) else f"Col {col+1}" for col in range(columnas)]# Encabezados
+        estilos = getSampleStyleSheet()
+        estilo_parrafo = estilos["Normal"]
+
+        encabezados = [Paragraph(self.tabla.horizontalHeaderItem(col).text() if self.tabla.horizontalHeaderItem(col) else f"Col {col+1}", estilo_parrafo) for col in range(columnas)]
         datos.append(encabezados)
 
-       
-        for fila in range(filas): # Filas
+        # Crear filas
+        for fila in range(filas):
             fila_datos = []
             for col in range(columnas):
                 item = self.tabla.item(fila, col)
-                fila_datos.append(item.text() if item else "")
+                texto = item.text() if item else ""
+                fila_datos.append(Paragraph(texto, estilo_parrafo))
             datos.append(fila_datos)
 
-        # Crear PDF
         pdf = SimpleDocTemplate(ruta_pdf, pagesize=landscape(letter))
-        tabla_pdf = Table(datos)
 
-        # Estilo de la tabla
+        page_width, _ = landscape(letter)
+        margen_total = 40
+        ancho_disponible = page_width - margen_total
+        ancho_col = ancho_disponible / columnas
+        col_widths = [ancho_col] * columnas
+
+        tabla_pdf = Table(datos, colWidths=col_widths)
+
         estilo = TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -1040,11 +1047,10 @@ class interfazUsuario(QWidget) :
         ])
         tabla_pdf.setStyle(estilo)
 
-        # Generar documento
         pdf.build([tabla_pdf])
 
-        toast = Toast("PDF descargado correctamente", parent=self) # Notificacion
-        toast.show()  
+        toast = Toast("PDF descargado correctamente", parent=self) #Notificacion
+        toast.show()
     #-----------------------------FIN------------------------------#
 
 
@@ -1057,21 +1063,27 @@ class interfazUsuario(QWidget) :
             for col_idx, valor in enumerate(fila_data):
                 item = QTableWidgetItem(str(valor))
                 self.tabla.setItem(fila_idx, col_idx, item)
-     #-----------------------------FIN------------------------------#
-                
-     #-----------------------------Metodo para editar la incidencia seleccionada------------------------------#
+    #-----------------------------FIN------------------------------#
+
+
+
+    #-----------------------------Metodo para editar la incidencia seleccionada------------------------------#
     def editar(self):
         fila = self.tabla.currentRow()
         if fila == -1:
             QMessageBox.warning(self, "Atención", "Selecciona una incidencia para editar")
             return
         #-----------------------------Recogida de datos de la incincia seleccionada------------------------------#
+        estado = self.tabla.item(fila, 6).text() 
+        if estado == "CERRADO":
+            QMessageBox.warning(self, "Atención", "La incidencia debe estar Abierta") #La incidencia debe estar abierta
+            return
         self.id_incidencia = self.tabla.item(fila, 0).text()  
         titulo = self.tabla.item(fila, 1).text()        
         descripcion = self.tabla.item(fila, 2).text()   
         gravedad = self.tabla.item(fila, 3).text()   
-        fecha = self.tabla.item(fila, 4).text()       
-        categoria = self.tabla.item(fila, 6).text() 
+        fecha = self.tabla.item(fila, 4).text()     
+        categoria = self.tabla.item(fila, 7).text() 
         #-----------------------------FIN------------------------------#
 
         #---------------------Especificar titulo de la ventana, moldear la geometria y moverla. Tambien esconder el apartado de Inicio de Sesion---------------------#
@@ -1370,14 +1382,39 @@ class interfazUsuario(QWidget) :
         if fila == -1:
             QMessageBox.warning(self, "Atención", "Selecciona una incidencia")
             return
-        
+
         self.id_incidencia = self.tabla.item(fila, 0).text()  
 
         if self.id_incidencia:
-            cerrarIncidencia(self.id_incidencia)  
-            self.filtrototal()
-            toast = Toast("Incidencia Cerrada", parent=self) #Notificacion
-            toast.show()  
+            #-----------------------------Seleccionar fecha de Cierre------------------------------#
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Fecha de Cierre")
+            dialog.resize(300, 50)
+            layout = QVBoxLayout(dialog)
+
+            textofechaCierre = QLabel("Fecha de cierre:")
+            layout.addWidget(textofechaCierre)
+
+            date_edit = QDateEdit()
+            date_edit.setCalendarPopup(True)
+            date_edit.setDate(QDate.currentDate()) 
+            layout.addWidget(date_edit)
+
+            botones = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            layout.addWidget(botones)
+
+            botones.accepted.connect(dialog.accept)
+            botones.rejected.connect(dialog.reject)
+            #-----------------------------FIN------------------------------#
+
+            #-----------------------------Cerrar Incidencia------------------------------#
+            if dialog.exec_() == QDialog.Accepted:
+                fecha_cierre = date_edit.date().toString("yyyy-MM-dd")
+                cerrarIncidencia(self.id_incidencia, fecha_cierre)  
+                self.filtrototal()
+                toast = Toast("Incidencia Cerrada", parent=self)
+                toast.show()
+            #-----------------------------FIN------------------------------#
     #-----------------------------FIN------------------------------#
 
 

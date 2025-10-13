@@ -21,7 +21,8 @@ def baseDeDatos():
         Titulo VARCHAR(40),
         Descripcion VARCHAR(400),
         Gravedad VARCHAR(10),
-        Fecha DATETIME NOT NULL,
+        Fecha_Creada DATETIME NOT NULL,
+        Fecha_Cierre DATETIME,
         Estado VARCHAR(7),
         Categoria VARCHAR(8),
         CONSTRAINT PK_IDINCIDENCIAS PRIMARY KEY (ID_Incidencia),
@@ -68,7 +69,7 @@ def vistaIdIncidencia():
 def vistasIncidencias(correoIniciado):
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
     cursor = conexion.cursor()
-    consulta = ("SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria FROM Incidencias WHERE Correo = ?")
+    consulta = ("SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha_Creada, Fecha_Cierre, Estado, Categoria FROM Incidencias WHERE Correo = ?")
     cursor.execute(consulta, (correoIniciado,))
     resultados = cursor.fetchall()
     conexion.close()
@@ -79,7 +80,7 @@ def vistasIncidencias(correoIniciado):
 
 # -------------------Metodo para filtrar la tabla------------------- #
 def obtener_incidencias(correo, categorias, estados, gravedades, fecha_inicio=None, fecha_fin=None):
-    consulta = f"SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Estado, Categoria FROM Incidencias WHERE Correo='{correo}'"
+    consulta = f"SELECT ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha_Creada, Fecha_Cierre, Estado, Categoria FROM Incidencias WHERE Correo='{correo}'"
 
     if categorias:
         consulta = consulta + " AND Categoria IN ('" + "','".join(categorias) + "')"
@@ -88,7 +89,7 @@ def obtener_incidencias(correo, categorias, estados, gravedades, fecha_inicio=No
     if gravedades:
         consulta = consulta + " AND Gravedad IN ('" + "','".join(gravedades) + "')"
     if fecha_inicio and fecha_fin:
-        consulta = consulta +  f" AND Fecha BETWEEN '{fecha_inicio}' AND '{fecha_fin}'"
+        consulta = consulta +  f" AND Fecha_Creada BETWEEN '{fecha_inicio}' AND '{fecha_fin}'"
 
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
@@ -129,7 +130,7 @@ def insertarUsuario(correo, password):
 def insertarIncidencia(correo, iD_Incidencias, titulo, descripcion, gravedad, fecha, categoria):
     consulta = (
         "INSERT INTO INCIDENCIAS "
-        "(Correo, ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha, Categoria, Estado) "
+        "(Correo, ID_Incidencia, Titulo, Descripcion, Gravedad, Fecha_Creada, Categoria, Estado) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, 'ABIERTO')"
     )
     conexion = sqlite3.connect("IncidenciasInformaticas.db") 
@@ -149,7 +150,7 @@ def actualizarIncidencia(id_incidencia, titulo, descripcion, gravedad, fecha, ca
         "Titulo = ?, "
         "Descripcion = ?, "
         "Gravedad = ?, "
-        "Fecha = ?, "
+        "Fecha_Creada = ?, "
         "Categoria = ? "
         "WHERE ID_Incidencia = ?"
     )
@@ -178,7 +179,7 @@ def eliminarIncidencia(id_incidencias):
 #---------------------Cambiar a Abierto el estado de una incidencia en la base de datos---------------------#
 def abrirIncidencia(id_incidencia):
 
-    consulta = "UPDATE INCIDENCIAS SET Estado = 'ABIERTO' WHERE ID_Incidencia = ?"
+    consulta = "UPDATE INCIDENCIAS SET Estado = 'ABIERTO', Fecha_Cierre = NULL WHERE ID_Incidencia = ?"
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
     cursor.execute(consulta, (id_incidencia,))
@@ -189,13 +190,11 @@ def abrirIncidencia(id_incidencia):
 
 
 #---------------------Cambiar a Cerrado el estado de una incidencia en la base de datos---------------------#
-def cerrarIncidencia(id_incidencia):
-
-    consulta = "UPDATE INCIDENCIAS SET Estado = 'CERRADO' WHERE ID_Incidencia = ?"
-
+def cerrarIncidencia(id_incidencia, fecha_cierre):
+    consulta = "UPDATE INCIDENCIAS SET Estado = 'CERRADO', Fecha_Cierre = ? WHERE ID_Incidencia = ?"
     conexion = sqlite3.connect("IncidenciasInformaticas.db")
     cursor = conexion.cursor()
-    cursor.execute(consulta, (id_incidencia,))
+    cursor.execute(consulta, (fecha_cierre, id_incidencia))
     conexion.commit()
     conexion.close()
 #-----------------------------FIN------------------------------#
@@ -217,14 +216,14 @@ def obtener_grafico(correo,nombre_db):
 
 
     tiempos_resolucion = []
-    tiene_fecha_cierre = _col_exists(cursor, "Incidencias", "FechaCierre") #Tiempo de resulucion
+    tiene_fecha_cierre = _col_exists(cursor, "Incidencias", "Fecha_Cierre") #Tiempo de resulucion
 
     if tiene_fecha_cierre:
         cursor.execute("""
-            SELECT Fecha, FechaCierre 
+            SELECT Fecha_Creada, Fecha_Cierre
             FROM Incidencias 
             WHERE Correo = ? 
-            AND FechaCierre IS NOT NULL
+            AND Fecha_Cierre IS NOT NULL
         """, (correo,))
         datos_fechas = cursor.fetchall()
 
