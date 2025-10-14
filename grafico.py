@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt #type: ignore
+import matplotlib.pyplot as plt    #type: ignore
 from baseDeDatos import obtener_grafico 
 #-----------------------------Creacion del grafico------------------------------#
 def generar_graficas(correo,nombre_db="IncidenciasInformaticas.db"):
