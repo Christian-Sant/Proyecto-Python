@@ -850,6 +850,7 @@ class interfazUsuario(QWidget) :
 
         #-----------------------------Checkbox de Baja------------------------------#
         self.checkboxBaja = QCheckBox("Baja")
+        self.checkboxBaja.stateChanged.connect(self.filtrototal)
         evento5 = QWidgetAction(self.menu)
         evento5.setDefaultWidget(self.checkboxBaja)
         self.menu.addAction(evento5)
